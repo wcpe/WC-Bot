@@ -1,0 +1,59 @@
+MainAdminQQGroup: 1008686886
+#主QQ群
+MainAdminQQ: 1008686886
+#主管理人
+PlayerJoinMessage:
+  Enable: true
+  Message: "%player%加入了服务器"
+#玩家加入服务器时 发送到Q群里面的话
+PlayerQuitMessage:
+  Enable: true
+  Message: "%player%退出了服务器"
+#玩家退出服务器时 发送到Q群里面的话
+Check:
+  GameCheck:
+    Message: "群:"
+    #发送至QQ群的检测文本
+    SendQQGroupMessage: "%player%>>>%chat%"
+    isRemoveColor: true
+    Tip:
+      Enable: true
+      #是否开启发送完毕提示
+      Message: "消息发送成功~"
+      #发送完毕提示消息
+  QQGroupCheck:
+    Message: "服:"
+    #发送至游戏内的检测文本
+    SendGameMessage: "[人工智障]%player%>>>%chat%"
+    isIDorName: true
+    #为true发送至游戏内就是QQ号 为false发送至游戏内就是QQ群昵称
+    isRemoveColor: true
+    Tip:
+      Enable: true
+      #是否开启发送完毕提示
+      Message: "消息发送成功~"
+      #发送完毕提示消息
+ListCommands: "/list"
+#群内检测头
+ListMessage: "当前在线人数:%online_number%\n玩家列表:%online_player%"
+System:
+  ListenPort: 12138
+  #插件开放的端口
+  Ip: "127.0.0.1"
+  Port: 5700
+  #Http上报地址
+Rcon:
+  Enable: false
+  Ip: "0.0.0.0"
+  Port: 19132
+  Password: "abcde"
+  Private: true
+  #只允许私聊使用 还是群聊 私聊都行
+  #true为只允许私聊 false为都行
+WhiteList:
+  Enable: true
+  #是否开启
+  Check: "申请白名单:"
+  #检测头
+  Message: "%player%成功申请了白名单~"
+  #申请成功提示 %player%为申请的玩家name
