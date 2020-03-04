@@ -57,3 +57,43 @@ WhiteList:
   #检测头
   Message: "%player%成功申请了白名单~"
   #申请成功提示 %player%为申请的玩家name
+PlayerBind:
+  Enable: true
+  #是否开启
+  Check: "绑定:"
+  #检测头
+  Message: "绑定成功~"
+  #绑定成功提示
+PlayerInfo:
+  Enable: true
+  #是否开启
+  Check: "我的信息"
+  #检测头
+  Message:
+  - '%player%个人信息'
+  - '金币:%money%'
+  - '状态:%online%'
+  - '离线时间:%offline_time%'
+  - '首次进服:%first_time%'
+  #信息
+AdminCommands:
+  #管理员指令列表
+  White:
+    MainCommand: "/White "
+    #主指令
+    Add: "add "
+    #添加
+    Del: "del "
+    #删除
+    List: "list"
+    #列表
+  Admin:
+    MainCommand: "/Admin "
+    Add: "add "
+    Del: "del "
+    List: "list"
+  Group:
+    MainCommand: "/Group "
+    Add: "add "
+    Del: "del "
+    List: "list"

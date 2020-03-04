@@ -56,6 +56,10 @@
 
     <repositories>
         <repository>
+            <id>onebone</id>
+            <url>http://jenkins.onebone.me/plugin/repository/everything/</url>
+        </repository>
+        <repository>
             <id>jitpack.io</id>
             <url>https://jitpack.io</url>
         </repository>
@@ -74,6 +78,17 @@
     </repositories>
 
     <dependencies>
+        <dependency>
+            <groupId>me.onebone</groupId>
+            <artifactId>economyapi</artifactId>
+            <version>1.0.1</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>nukkit</groupId>
+            <artifactId>nukkit</artifactId>
+            <version>1.0.0</version>
+        </dependency>
         <dependency>
             <groupId>com.github.hydevelop</groupId>
             <artifactId>PicqBotX</artifactId>

@@ -16,17 +16,18 @@ import cn.nukkit.event.player.PlayerQuitEvent;
 import cn.nukkit.plugin.PluginBase;
 import cn.nukkit.utils.Config;
 import cn.nukkit.utils.TextFormat;
+import com.wcpe.MyKuQ.Utils.Confirm;
+import me.onebone.economyapi.EconomyAPI;
 import net.kronos.rkon.core.Rcon;
 import net.kronos.rkon.core.ex.AuthenticationException;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class Main extends PluginBase implements Listener {
+
+    private EconomyAPI economy;
 
     private long MainAdminQQGroup;
     private long MainAdminQQ;
@@ -66,10 +67,40 @@ public class Main extends PluginBase implements Listener {
     private String WhiteList_Check;
     private String WhiteList_Message;
 
+    private boolean PlayerBind_Enable;
+    private String PlayerBind_Check;
+    private String PlayerBind_Message;
+
+    private boolean PlayerInfo_Enable;
+    private String PlayerInfo_Check;
+    private List<String> PlayerInfo_Message;
+
     private List<Long> Admin;
     private List<Long> QQGroup;
 
-    private HashMap<String,String> WhiteListPlayer = new HashMap<String,String>();
+    private HashMap<String, String> WhiteListPlayer = new HashMap<String, String>();
+
+    private HashMap<String, KuPlayer> KuPlayer = new HashMap<>();
+
+    private String Admins_White;
+    private String Admins_White_add;
+    private String Admins_White_del;
+    private String Admins_White_list;
+
+    private String Admins_Group;
+    private String Admins_Group_add;
+    private String Admins_Group_del;
+    private String Admins_Group_list;
+
+    private String Admins_Admin;
+    private String Admins_Admin_add;
+    private String Admins_Admin_del;
+    private String Admins_Admin_list;
+
+    private String Admins_Bind;
+    private String Admins_Bind_add;
+    private String Admins_Bind_del;
+    private String Admins_Bind_list;
 
 
     @Override
@@ -79,6 +110,7 @@ public class Main extends PluginBase implements Listener {
 
     @Override
     public void onEnable() {
+        economy = EconomyAPI.getInstance();
         saveDefaultConfig();
         checkConfig();
         saveResource("data.yml");
@@ -88,6 +120,7 @@ public class Main extends PluginBase implements Listener {
             loadRcon();
         }
         getServer().getPluginManager().registerEvents(this, this);
+        getServer().getPluginManager().registerEvents(new Confirm(this), this);
         getLogger().info(TextFormat.GREEN + "MyKuQ 加载完成");
     }
 
@@ -99,53 +132,89 @@ public class Main extends PluginBase implements Listener {
 
     private void reload() {
         reloadConfig();
-        MainAdminQQGroup = this.getConfig().getLong("MainAdminQQGroup");
-        MainAdminQQ = this.getConfig().getLong("MainAdminQQ");
+        this.MainAdminQQGroup = this.getConfig().getLong("MainAdminQQGroup");
+        this.MainAdminQQ = this.getConfig().getLong("MainAdminQQ");
 
-        PlayerJoinMessage = this.getConfig().getString("PlayerJoinMessage.Message", "%player%加入了服务器");
-        isPlayerJoinMessage = this.getConfig().getBoolean("PlayerJoinMessage.Enable", false);
+        this.PlayerJoinMessage = this.getConfig().getString("PlayerJoinMessage.Message", "%player%加入了服务器");
+        this.isPlayerJoinMessage = this.getConfig().getBoolean("PlayerJoinMessage.Enable", false);
 
-        PlayerQuitMessage = this.getConfig().getString("PlayerQuitMessage.Message", "%player%退出了服务器");
-        isPlayerQuitMessage = this.getConfig().getBoolean("PlayerQuitMessage.Enable", false);
+        this.PlayerQuitMessage = this.getConfig().getString("PlayerQuitMessage.Message", "%player%退出了服务器");
+        this.isPlayerQuitMessage = this.getConfig().getBoolean("PlayerQuitMessage.Enable", false);
 
-        GameCheck = this.getConfig().getString("Check.GameCheck.Message", "群:");
-        SendQQGroupMessage = this.getConfig().getString("Check.GameCheck.SendQQGroupMessage", "%player%>>>%chat%");
-        Game_to_QQ_isRemoveColor = this.getConfig().getBoolean("Check.GameCheck.isRemoveColor", true);
-        QQ_to_Game_SendSuccessTipEnable = this.getConfig().getBoolean("Check.GameCheck.Tip.Enable", true);
-        QQ_to_Game_SendSuccessTip = this.getConfig().getString("Check.GameCheck.Tip.Message", "消息发送成功~");
+        this.GameCheck = this.getConfig().getString("Check.GameCheck.Message", "群:");
+        this.SendQQGroupMessage = this.getConfig().getString("Check.GameCheck.SendQQGroupMessage", "%player%>>>%chat%");
+        this.Game_to_QQ_isRemoveColor = this.getConfig().getBoolean("Check.GameCheck.isRemoveColor", true);
+        this.QQ_to_Game_SendSuccessTipEnable = this.getConfig().getBoolean("Check.GameCheck.Tip.Enable", true);
+        this.QQ_to_Game_SendSuccessTip = this.getConfig().getString("Check.GameCheck.Tip.Message", "消息发送成功~");
 
-        QQGroupCheck = this.getConfig().getString("Check.QQGroupCheck.Message", "服:");
-        SendGameMessage = this.getConfig().getString("Check.QQGroupCheck.SendGameMessage", "[人工智障]%player%>>>%chat%");
-        isIDorName = this.getConfig().getBoolean("Check.QQGroupCheck.isIDorName", true);
-        QQ_to_Game_isRemoveColor = this.getConfig().getBoolean("Check.QQGroupCheck.isRemoveColor", true);
-        Game_to_QQ_SendSuccessTipEnable = this.getConfig().getBoolean("Check.QQGroupCheck.Tip.Enable", true);
-        Game_to_QQ_SendSuccessTip = this.getConfig().getString("Check.QQGroupCheck.Tip.Message", "消息发送成功~");
+        this.QQGroupCheck = this.getConfig().getString("Check.QQGroupCheck.Message", "服:");
+        this.SendGameMessage = this.getConfig().getString("Check.QQGroupCheck.SendGameMessage", "[人工智障]%player%>>>%chat%");
+        this.isIDorName = this.getConfig().getBoolean("Check.QQGroupCheck.isIDorName", true);
+        this.QQ_to_Game_isRemoveColor = this.getConfig().getBoolean("Check.QQGroupCheck.isRemoveColor", true);
+        this.Game_to_QQ_SendSuccessTipEnable = this.getConfig().getBoolean("Check.QQGroupCheck.Tip.Enable", true);
+        this.Game_to_QQ_SendSuccessTip = this.getConfig().getString("Check.QQGroupCheck.Tip.Message", "消息发送成功~");
 
-        ListCommands = this.getConfig().getString("ListCommands", "/list");
-        ListMessage = this.getConfig().getString("ListMessage", "当前在线人数:%online_number%\n玩家列表:%online_player%");
+        this.ListCommands = this.getConfig().getString("ListCommands", "/list");
+        this.ListMessage = this.getConfig().getString("ListMessage", "当前在线人数:%online_number%\n玩家列表:%online_player%");
 
-        System_ListenPORT = this.getConfig().getInt("System.ListenPort", 12138);
-        System_IP = this.getConfig().getString("System.Ip", "127.0.0.1");
-        System_PORT = this.getConfig().getInt("System.Port", 5700);
+        this.System_ListenPORT = this.getConfig().getInt("System.ListenPort", 12138);
+        this.System_IP = this.getConfig().getString("System.Ip", "127.0.0.1");
+        this.System_PORT = this.getConfig().getInt("System.Port", 5700);
 
-        Rcon_Enable = this.getConfig().getBoolean("Rcon.Enable", false);
-        Rcon_IP = this.getConfig().getString("Rcon.Ip", "0.0.0.0");
-        Rcon_PORT = this.getConfig().getInt("Rcon.Port", 19132);
-        Rcon_PASSWORD = this.getConfig().getString("Rcon.Password", "abcde");
-        isPrivate = this.getConfig().getBoolean("Rcon.Private", true);
+        this.Rcon_Enable = this.getConfig().getBoolean("Rcon.Enable", false);
+        this.Rcon_IP = this.getConfig().getString("Rcon.Ip", "0.0.0.0");
+        this.Rcon_PORT = this.getConfig().getInt("Rcon.Port", 19132);
+        this.Rcon_PASSWORD = this.getConfig().getString("Rcon.Password", "abcde");
+        this.isPrivate = this.getConfig().getBoolean("Rcon.Private", true);
 
-        WhiteList_Enable = this.getConfig().getBoolean("WhiteList.Enable");
-        WhiteList_Check = this.getConfig().getString("WhiteList.Check");
-        WhiteList_Message = this.getConfig().getString("WhiteList.Message");
+        this.WhiteList_Enable = this.getConfig().getBoolean("WhiteList.Enable");
+        this.WhiteList_Check = this.getConfig().getString("WhiteList.Check");
+        this.WhiteList_Message = this.getConfig().getString("WhiteList.Message");
+
+        this.PlayerBind_Enable = this.getConfig().getBoolean("PlayerBind.Enable");
+        this.PlayerBind_Check = this.getConfig().getString("PlayerBind.Check");
+        this.PlayerBind_Message = this.getConfig().getString("PlayerBind.Message");
+
+        this.PlayerInfo_Enable = this.getConfig().getBoolean("PlayerInfo.Enable");
+        this.PlayerInfo_Check = this.getConfig().getString("PlayerInfo.Check");
+        this.PlayerInfo_Message = this.getConfig().getStringList("PlayerInfo.Message");
 
 
         Config data = new Config(new File(this.getDataFolder(), "data.yml"));
-        Admin = data.getLongList("AdminQQ");
-        QQGroup = data.getLongList("QQGroup");
-        if(data.get("WhiteList")!=null){
+        this.Admin = data.getLongList("AdminQQ");
+        this.QQGroup = data.getLongList("QQGroup");
+        if (data.get("WhiteList") != null) {
             WhiteListPlayer.clear();
-            WhiteListPlayer.putAll((Map<String,String>) data.get("WhiteList"));
+            WhiteListPlayer.putAll((Map<String, String>) data.get("WhiteList"));
         }
+        if (data.get("KuPlayer") != null) {
+            KuPlayer.clear();
+            HashMap<String, String> kuplayer = (HashMap<String, String>) data.get("KuPlayer");
+            for (Map.Entry<String, String> stringUUIDEntry : kuplayer.entrySet()) {
+                KuPlayer.put(stringUUIDEntry.getKey(), new KuPlayer(getServer().getOfflinePlayer(UUID.fromString(stringUUIDEntry.getValue())), Long.valueOf(stringUUIDEntry.getKey())));
+            }
+        }
+
+
+        this.Admins_White = this.getConfig().getString("AdminCommands.White.MainCommand");
+        this.Admins_White_add = this.getConfig().getString("AdminCommands.White.Add");
+        this.Admins_White_del = this.getConfig().getString("AdminCommands.White.Del");
+        this.Admins_White_list = this.getConfig().getString("AdminCommands.White.List");
+
+        this.Admins_Group = this.getConfig().getString("AdminCommands.Admin.MainCommand");
+        this.Admins_Group_add = this.getConfig().getString("AdminCommands.Admin.Add");
+        this.Admins_Group_del = this.getConfig().getString("AdminCommands.Admin.Del");
+        this.Admins_Group_list = this.getConfig().getString("AdminCommands.Admin.List");
+
+        this.Admins_Admin = this.getConfig().getString("AdminCommands.Group.MainCommand");
+        this.Admins_Admin_add = this.getConfig().getString("AdminCommands.Group.Add");
+        this.Admins_Admin_del = this.getConfig().getString("AdminCommands.Group.Del");
+        this.Admins_Admin_list = this.getConfig().getString("AdminCommands.Group.List");
+
+//        this.Admins_Bind = this.getConfig().getString("AdminCommands.Bind.MainCommand");
+//        this.Admins_Bind_add = this.getConfig().getString("AdminCommands.Bind.Add");
+//        this.Admins_Bind_del = this.getConfig().getString("AdminCommands.Bind.Del");
+//        this.Admins_Bind_list = this.getConfig().getString("AdminCommands.Bind.List");
 
     }
 
@@ -191,16 +260,21 @@ public class Main extends PluginBase implements Listener {
         data.set("AdminQQ", Admin);
         data.set("QQGroup", QQGroup);
         data.set("WhiteList", WhiteListPlayer);
+        HashMap<String, String> kuplayer = new HashMap<>();
+        for (Map.Entry<String, com.wcpe.MyKuQ.KuPlayer> stringKuPlayerEntry : KuPlayer.entrySet()) {
+            kuplayer.put(stringKuPlayerEntry.getKey(), stringKuPlayerEntry.getValue().getOfflinePlayer().getUniqueId().toString());
+        }
+        data.set("KuPlayer", kuplayer);
         data.save(file);
     }
 
-    private void checkConfig()  {
+    private void checkConfig() {
         Config a = new Config();
         a.load(this.getResource("config.yml"));
         Set<String> keys = this.getConfig().getKeys(true);
-        for(String b:a.getKeys(true)){
-            if(!keys.contains(b)){
-                this.getConfig().set(b,a.get(b));
+        for (String b : a.getKeys(true)) {
+            if (!keys.contains(b)) {
+                this.getConfig().set(b, a.get(b));
             }
         }
         saveConfig();
@@ -249,6 +323,7 @@ public class Main extends PluginBase implements Listener {
         }
     }
 
+
     @EventHandler
     public void join(PlayerJoinEvent e) {
         if (isPlayerJoinMessage) {
@@ -278,8 +353,8 @@ public class Main extends PluginBase implements Listener {
             for (long lon : QQGroup) {
                 a.sendGroupMsg(lon, s);
             }
-            if(isGame_to_QQ_SendSuccessTipEnable())
-            e.getPlayer().sendMessage(getGame_to_QQ_SendSuccessTip());
+            if (isGame_to_QQ_SendSuccessTipEnable())
+                e.getPlayer().sendMessage(getGame_to_QQ_SendSuccessTip());
         } else if (i != -1) {
             String s = SendQQGroupMessage.replaceAll("%player%", e.getPlayer().getName()).replaceAll("%chat%", e.getMessage().substring(i + GameCheck.length(), e.getMessage().length()));
             if (Game_to_QQ_isRemoveColor) {
@@ -292,11 +367,106 @@ public class Main extends PluginBase implements Listener {
             for (long lon : QQGroup) {
                 a.sendGroupMsg(lon, s);
             }
-            if(isGame_to_QQ_SendSuccessTipEnable())
+            if (isGame_to_QQ_SendSuccessTipEnable())
                 e.getPlayer().sendMessage(getGame_to_QQ_SendSuccessTip());
         }
     }
 
+    public EconomyAPI getEconomy() {
+        return economy;
+    }
+
+    public boolean isPlayerBind_Enable() {
+        return PlayerBind_Enable;
+    }
+
+    public String getPlayerBind_Check() {
+        return PlayerBind_Check;
+    }
+
+    public String getPlayerBind_Message() {
+        return PlayerBind_Message;
+    }
+
+    public boolean isPlayerInfo_Enable() {
+        return PlayerInfo_Enable;
+    }
+
+    public String getPlayerInfo_Check() {
+        return PlayerInfo_Check;
+    }
+
+    public List<String> getPlayerInfo_Message() {
+        return PlayerInfo_Message;
+    }
+
+    public HashMap<String, com.wcpe.MyKuQ.KuPlayer> getKuPlayer() {
+        return KuPlayer;
+    }
+
+    public String getAdmins_Bind() {
+        return Admins_Bind;
+    }
+
+    public String getAdmins_Bind_add() {
+        return Admins_Bind_add;
+    }
+
+    public String getAdmins_Bind_del() {
+        return Admins_Bind_del;
+    }
+
+    public String getAdmins_Bind_list() {
+        return Admins_Bind_list;
+    }
+
+    public String getAdmins_White() {
+        return Admins_White;
+    }
+
+    public String getAdmins_White_add() {
+        return Admins_White_add;
+    }
+
+    public String getAdmins_White_del() {
+        return Admins_White_del;
+    }
+
+    public String getAdmins_White_list() {
+        return Admins_White_list;
+    }
+
+    public String getAdmins_Group() {
+        return Admins_Group;
+    }
+
+    public String getAdmins_Group_add() {
+        return Admins_Group_add;
+    }
+
+    public String getAdmins_Group_del() {
+        return Admins_Group_del;
+    }
+
+    public String getAdmins_Group_list() {
+        return Admins_Group_list;
+    }
+
+    public String getAdmins_Admin() {
+        return Admins_Admin;
+    }
+
+    public String getAdmins_Admin_add() {
+        return Admins_Admin_add;
+    }
+
+    public String getAdmins_Admin_del() {
+        return Admins_Admin_del;
+    }
+
+    public String getAdmins_Admin_list() {
+        return Admins_Admin_list;
+    }
 
     public boolean isWhiteList_Enable() {
         return WhiteList_Enable;
@@ -310,9 +480,10 @@ public class Main extends PluginBase implements Listener {
         return WhiteList_Message;
     }
 
-    public HashMap<String,String> getWhiteListPlayer() {
+    public HashMap<String, String> getWhiteListPlayer() {
         return WhiteListPlayer;
     }
+
     public long getMainAdminQQGroup() {
         return MainAdminQQGroup;
     }

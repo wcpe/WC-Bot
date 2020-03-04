@@ -15,8 +15,20 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class WxysUtil {
+    /**
+     * @return String
+     * @author WCPE
+     * @apiNote 时间戳转时间
+     **/
+    public static String toTime(long timeStamp) {
+        SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy年MM月dd日HH时mm分ss秒");
+        String sd2 = sdf2.format(new Date(Long.parseLong(String.valueOf(timeStamp))));
+        return sd2;
+    }
     /**
      * @return URL
      * @author WCPE
