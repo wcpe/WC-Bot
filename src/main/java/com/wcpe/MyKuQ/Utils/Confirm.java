@@ -31,7 +31,7 @@ public class Confirm implements Listener {
                 .equalsIgnoreCase(String.valueOf(codes.get(p.getUniqueId())))) {
             a.getKuPlayer().put(String.valueOf(codes.get(p.getUniqueId())), new KuPlayer(a.getServer().getOfflinePlayer(p.getUniqueId()), codes.get(p.getUniqueId())));
             codes.remove(p.getUniqueId());
-            p.sendMessage("§a验证成功!");
+            p.sendMessage(a.getMessage_GameConfirmFinish());
             e.setCancelled(true);
         }
     }
@@ -41,7 +41,7 @@ public class Confirm implements Listener {
         a.getServer().getScheduler().scheduleDelayedTask(a,()->{
             codes.remove(p.getUniqueId());
         },10*20);
-        p.sendMessage("§6Q群内的: " + qq + " 用户正在绑定此账号\n§6请在聊天栏输入 confirm " + qq + " 以完成绑定\n§6如果非本人操作请忽略此消息\n§7十秒有效时间~!");
+        p.sendMessage(a.getMessage_GameConfirm().replaceAll("%qq%",""+qq));
     }
 
 }

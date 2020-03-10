@@ -102,6 +102,15 @@ public class Main extends PluginBase implements Listener {
     private String Admins_Bind_del;
     private String Admins_Bind_list;
 
+    //
+
+    private String Message_PlayerQuitGroup;
+    private String Message_KickPlayer;
+    private String Message_PlayerOffline;
+    private String Message_GroupConfirm;
+    private String Message_GameConfirm;
+    private String Message_GameConfirmFinish;
+    private String Message_NoBind;
 
     @Override
     public void onLoad() {
@@ -113,6 +122,7 @@ public class Main extends PluginBase implements Listener {
         economy = EconomyAPI.getInstance();
         saveDefaultConfig();
         checkConfig();
+        saveResource("Message.yml");
         saveResource("data.yml");
         reload();
         loadKuQ();
@@ -201,21 +211,32 @@ public class Main extends PluginBase implements Listener {
         this.Admins_White_del = this.getConfig().getString("AdminCommands.White.Del");
         this.Admins_White_list = this.getConfig().getString("AdminCommands.White.List");
 
-        this.Admins_Group = this.getConfig().getString("AdminCommands.Admin.MainCommand");
-        this.Admins_Group_add = this.getConfig().getString("AdminCommands.Admin.Add");
-        this.Admins_Group_del = this.getConfig().getString("AdminCommands.Admin.Del");
-        this.Admins_Group_list = this.getConfig().getString("AdminCommands.Admin.List");
+        this.Admins_Group = this.getConfig().getString("AdminCommands.Group.MainCommand");
+        this.Admins_Group_add = this.getConfig().getString("AdminCommands.Group.Add");
+        this.Admins_Group_del = this.getConfig().getString("AdminCommands.Group.Del");
+        this.Admins_Group_list = this.getConfig().getString("AdminCommands.Group.List");
 
-        this.Admins_Admin = this.getConfig().getString("AdminCommands.Group.MainCommand");
-        this.Admins_Admin_add = this.getConfig().getString("AdminCommands.Group.Add");
-        this.Admins_Admin_del = this.getConfig().getString("AdminCommands.Group.Del");
-        this.Admins_Admin_list = this.getConfig().getString("AdminCommands.Group.List");
+        this.Admins_Admin = this.getConfig().getString("AdminCommands.Admin.MainCommand");
+        this.Admins_Admin_add = this.getConfig().getString("AdminCommands.Admin.Add");
+        this.Admins_Admin_del = this.getConfig().getString("AdminCommands.Admin.Del");
+        this.Admins_Admin_list = this.getConfig().getString("AdminCommands.Admin.List");
 
 //        this.Admins_Bind = this.getConfig().getString("AdminCommands.Bind.MainCommand");
 //        this.Admins_Bind_add = this.getConfig().getString("AdminCommands.Bind.Add");
 //        this.Admins_Bind_del = this.getConfig().getString("AdminCommands.Bind.Del");
 //        this.Admins_Bind_list = this.getConfig().getString("AdminCommands.Bind.List");
+        reloadMessage();
+    }
 
+    private void reloadMessage() {
+        Config mess = new Config(new File(this.getDataFolder(), "data.yml"));
+        Message_PlayerQuitGroup = mess.getString("PlayerQuitGroup");
+        Message_KickPlayer = mess.getString("KickPlayer");
+        Message_PlayerOffline = mess.getString("PlayerOffline");
+        Message_GroupConfirm = mess.getString("GroupConfirm");
+        Message_GameConfirm = mess.getString("GameConfirm");
+        Message_GameConfirmFinish = mess.getString("GameConfirmFinish");
+        Message_NoBind = mess.getString("NoBind");
     }
 
     private PicqConfig config;
@@ -370,6 +391,34 @@ public class Main extends PluginBase implements Listener {
             if (isGame_to_QQ_SendSuccessTipEnable())
                 e.getPlayer().sendMessage(getGame_to_QQ_SendSuccessTip());
         }
+    }
+
+    public String getMessage_PlayerQuitGroup() {
+        return Message_PlayerQuitGroup;
+    }
+
+    public String getMessage_KickPlayer() {
+        return Message_KickPlayer;
+    }
+
+    public String getMessage_PlayerOffline() {
+        return Message_PlayerOffline;
+    }
+
+    public String getMessage_GroupConfirm() {
+        return Message_GroupConfirm;
+    }
+
+    public String getMessage_GameConfirm() {
+        return Message_GameConfirm;
+    }
+
+    public String getMessage_GameConfirmFinish() {
+        return Message_GameConfirmFinish;
+    }
+
+    public String getMessage_NoBind() {
+        return Message_NoBind;
     }
 
     public EconomyAPI getEconomy() {

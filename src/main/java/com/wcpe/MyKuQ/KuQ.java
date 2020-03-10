@@ -30,7 +30,7 @@ public class KuQ extends IcqListener {
             a.getWhiteListPlayer().remove(String.valueOf(e.getUserId()));
             try {
                 a.getServer().getPlayer(s).kick();
-                a.getA().sendGroupMsg(e.getGroupId(), "发现该退群玩家绑定的游戏id" + s + "在线 踢出玩家成功~");
+                a.getA().sendGroupMsg(e.getGroupId(), a.getMessage_PlayerQuitGroup().replaceAll("%player%",s));
             } catch (NullPointerException ee) {
                 return;
             }
@@ -244,7 +244,7 @@ public class KuQ extends IcqListener {
                     if (last != null) {
                         try {
                             a.getServer().getPlayer(last).kick();
-                            e.respond("发现该QQ上次申请的玩家白名单" + last + "在线 踢出玩家成功~");
+                            e.respond(a.getMessage_KickPlayer().replaceAll("%player%",last));
                         } catch (NullPointerException ee) {
                             return;
                         }
@@ -261,10 +261,10 @@ public class KuQ extends IcqListener {
                     try {
                         player = a.getServer().getPlayer(name);
                     } catch (NullPointerException e1) {
-                        e.respond("玩家不存在或不在线~");
+                        e.respond(a.getMessage_PlayerOffline());
                         return;
                     }
-                    e.respond("请在游戏中验证~");
+                    e.respond(a.getMessage_GroupConfirm());
                     Confirm.start(player, user);
                     return;
                 }
@@ -275,7 +275,7 @@ public class KuQ extends IcqListener {
                 if (a.isPlayerInfo_Enable()) {
                     KuPlayer kuPlayer = a.getKuPlayer().get(String.valueOf(user));
                     if (kuPlayer == null) {
-                        e.respond("你没有绑定游戏账号~");
+                        e.respond(a.getMessage_NoBind());
                         return;
                     }
 
