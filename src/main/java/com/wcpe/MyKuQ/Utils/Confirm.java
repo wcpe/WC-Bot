@@ -5,17 +5,15 @@ import cn.nukkit.Player;
 import cn.nukkit.event.EventHandler;
 import cn.nukkit.event.Listener;
 import cn.nukkit.event.player.PlayerChatEvent;
-import cn.nukkit.utils.Config;
 import com.wcpe.MyKuQ.KuPlayer;
 import com.wcpe.MyKuQ.Main;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.UUID;
 
 public class Confirm implements Listener {
     public Confirm(Main a) {
-        this.a = a;
+        Confirm.a = a;
     }
 
     private static Main a;

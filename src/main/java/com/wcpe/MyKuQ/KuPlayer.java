@@ -1,7 +1,6 @@
 package com.wcpe.MyKuQ;
 
 import cn.nukkit.IPlayer;
-import cn.nukkit.OfflinePlayer;
 
 public class KuPlayer {
     public KuPlayer(IPlayer offlinePlayer, long qq) {

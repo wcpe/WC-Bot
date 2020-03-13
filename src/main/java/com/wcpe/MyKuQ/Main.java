@@ -374,13 +374,15 @@ public class Main extends PluginBase implements Listener {
             for (long lon : QQGroup) {
                 a.sendGroupMsg(lon, s);
             }
-            if (isGame_to_QQ_SendSuccessTipEnable())
+            if (isGame_to_QQ_SendSuccessTipEnable()) {
                 e.getPlayer().sendMessage(getGame_to_QQ_SendSuccessTip());
+            }
         } else if (i != -1) {
             String s = SendQQGroupMessage.replaceAll("%player%", e.getPlayer().getName()).replaceAll("%chat%", e.getMessage().substring(i + GameCheck.length(), e.getMessage().length()));
             if (Game_to_QQ_isRemoveColor) {
-                if (s.contains("&"))
+                if (s.contains("&")) {
                     s = s.replaceAll("&", "");
+                }
             } else {
                 s = s.replaceAll("&", "§");
             }
@@ -388,8 +390,9 @@ public class Main extends PluginBase implements Listener {
             for (long lon : QQGroup) {
                 a.sendGroupMsg(lon, s);
             }
-            if (isGame_to_QQ_SendSuccessTipEnable())
+            if (isGame_to_QQ_SendSuccessTipEnable()) {
                 e.getPlayer().sendMessage(getGame_to_QQ_SendSuccessTip());
+            }
         }
     }
 

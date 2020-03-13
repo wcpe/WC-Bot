@@ -80,8 +80,9 @@ public class WxysUtil {
         Reader in = new InputStreamReader(inputStream, "UTF-8");
         for (; ; ) {
             int rsz = in.read(buffer, 0, buffer.length);
-            if (rsz < 0)
+            if (rsz < 0) {
                 break;
+            }
             out.append(buffer, 0, rsz);
         }
         return out.toString();

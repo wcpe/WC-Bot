@@ -53,7 +53,6 @@ public class KuQ extends IcqListener {
                     }
                     e.respond(result);
                 }
-                return;
             }
             if (user == a.getMainAdminQQ()) {
                 String Admin_add = a.getAdmins_Admin() + a.getAdmins_Admin_add();
@@ -203,16 +202,18 @@ public class KuQ extends IcqListener {
                 String b = a.isIDorName() ? user + "" : e.getSender().getInfo().getNickname();
                 String s = a.getSendGameMessage().replaceAll("%player%", b).replaceAll("%chat%", message);
                 Server.getInstance().broadcastMessage(s);
-                if (a.isQQ_to_Game_SendSuccessTipEnable())
+                if (a.isQQ_to_Game_SendSuccessTipEnable()) {
                     e.respond(a.getQQ_to_Game_SendSuccessTip());
+                }
                 return;
             } else if (i != -1) {
                 message = message.substring(i + a.getQQGroupCheck().length());
                 String b = a.isIDorName() ? user + "" : e.getSender().getInfo().getNickname();
                 String s = a.getSendGameMessage().replaceAll("%player%", b).replaceAll("%chat%", message);
                 if (a.isQQ_to_Game_isRemoveColor()) {
-                    if (s.contains("&"))
+                    if (s.contains("&")) {
                         s = s.replaceAll("&", "");
+                    }
                 } else {
                     s = s.replaceAll("&", "§");
                 }
