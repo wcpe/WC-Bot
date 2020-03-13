@@ -229,7 +229,7 @@ public class Main extends PluginBase implements Listener {
     }
 
     private void reloadMessage() {
-        Config mess = new Config(new File(this.getDataFolder(), "data.yml"));
+        Config mess = new Config(new File(this.getDataFolder(), "Message.yml"));
         Message_PlayerQuitGroup = mess.getString("PlayerQuitGroup");
         Message_KickPlayer = mess.getString("KickPlayer");
         Message_PlayerOffline = mess.getString("PlayerOffline");
