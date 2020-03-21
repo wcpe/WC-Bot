@@ -8,11 +8,14 @@ import cc.moecraft.icq.event.events.notice.groupmember.decrease.EventNoticeGroup
 import cc.moecraft.icq.sender.returndata.returnpojo.get.RGroup;
 import cn.nukkit.Player;
 import cn.nukkit.Server;
+import com.wcpe.MyKuQ.Obj.KuPlayer;
 import com.wcpe.MyKuQ.Utils.Confirm;
 import com.wcpe.MyKuQ.Utils.WxysUtil;
 
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.Map;
+import java.util.Random;
 import java.util.UUID;
 
 public class KuQ extends IcqListener {
@@ -24,15 +27,18 @@ public class KuQ extends IcqListener {
 
     @EventHandler
     public void QuitGroup(EventNoticeGroupMemberDecrease e) {
-        String s = a.getWhiteListPlayer().get(String.valueOf(e.getUserId()));
-        if (s != null) {
-            a.getServer().removeWhitelist(s);
-            a.getWhiteListPlayer().remove(String.valueOf(e.getUserId()));
-            try {
-                a.getServer().getPlayer(s).kick();
-                a.getA().sendGroupMsg(e.getGroupId(), a.getMessage_PlayerQuitGroup().replaceAll("%player%",s));
-            } catch (NullPointerException ee) {
-                return;
+        long group = e.getGroupId();
+        if (isGroupList(group)) {
+            String s = a.getWhiteListPlayer().get(String.valueOf(e.getUserId()));
+            if (s != null) {
+                a.getServer().removeWhitelist(s);
+                a.getWhiteListPlayer().remove(String.valueOf(e.getUserId()));
+                try {
+                    a.getServer().getPlayer(s).kick();
+                    a.getA().sendGroupMsg(e.getGroupId(), a.getMessage_PlayerQuitGroup().replaceAll("%player%", s));
+                } catch (NullPointerException ee) {
+                    return;
+                }
             }
         }
     }
@@ -174,14 +180,63 @@ public class KuQ extends IcqListener {
                 e.respond("白名单列表:\n" + a.getWhiteListPlayer().toString());
                 return;
             }
+            String Bind_add = a.getAdmins_Bind() + a.getAdmins_Bind_add();
+            int bind_add = message.indexOf(Bind_add);
+            if (bind_add != -1) {
+                try {
+                    String s = message.substring(bind_add + Bind_add.length());
+                    String[] s1 = s.split(" ");
+
+                    a.getKuPlayer().put(s1[0], new KuPlayer(a.getServer().getOfflinePlayer(s1[1]), Long.valueOf(s1[0])));
+                    e.respond("添加玩家:" + s1[1] + " QQ:" + s1[0] + "成功");
+                    return;
+                } catch (Exception ee) {
+                    e.respond("使用方法:/Bind add QQ号 玩家id");
+                }
+            }
+            String Bind_del = a.getAdmins_Bind() + a.getAdmins_Bind_del();
+            int bind_del = message.indexOf(Bind_del);
+            if (bind_del != -1) {
+                try {
+                    String s = message.substring(bind_del + Bind_del.length());
+                    if (a.getKuPlayer().containsKey(s)) {
+                        a.getKuPlayer().remove(s);
+                        e.respond("将" + s + "从白名单删除成功!");
+                        return;
+                    } else {
+                        e.respond(s + "玩家未绑定!");
+                    }
+                } catch (Exception ee) {
+                    e.respond("使用方法:/Bind del QQ号");
+                }
+            }
+            String Bind_list = a.getAdmins_Bind() + a.getAdmins_Bind_list();
+            int bind_list = message.indexOf(Bind_list);
+            if (bind_list != -1) {
+                StringBuilder sb = new StringBuilder();
+                a.getKuPlayer().entrySet().forEach((s) -> {
+                    sb.append("QQ:"+s.getKey() +" 绑定:"+s.getValue().getOfflinePlayer().getName()+"\n");
+                });
+                sb.setCharAt(sb.length() - 1, '\0');
+                e.respond("玩家绑定列表:\n" + sb.toString());
+                return;
+            }
 
         }
     }
 
+    /***
+     * @param group qq群号
+     * @return 返回qq群是否为主副群
+     */
+    private boolean isGroupList(long group) {
+        return (a.getQQGroup().contains(group) || a.getMainAdminQQGroup() == group);
+    }
+
     @EventHandler
-    public void GroupMessage(EventGroupMessage e) {
+    public void AdminGroupMessage(EventGroupMessage e) {
         long group = e.getGroup().getId();
-        if (a.getQQGroup().contains(group) || a.getMainAdminQQGroup() == group) {
+        if (isGroupList(group)) {
             long user = e.getSender().getId();
             String message = e.getMessage();
             if (a.isRcon_Enable() && a.isPrivate()) {
@@ -197,6 +252,17 @@ public class KuQ extends IcqListener {
                     return;
                 }
             }
+        }
+
+    }
+
+    @EventHandler
+    public void PlayerGroupMessage(EventGroupMessage e) {
+        long group = e.getGroup().getId();
+        if (isGroupList(group)) {
+            long user = e.getSender().getId();
+            String message = e.getMessage();
+
             int i = message.indexOf(a.getQQGroupCheck());
             if (a.getQQGroupCheck().equals("")) {
                 String b = a.isIDorName() ? user + "" : e.getSender().getInfo().getNickname();
@@ -223,6 +289,7 @@ public class KuQ extends IcqListener {
                 }
                 return;
             }
+            //list
             if (message.equals(a.getListCommands())) {
                 StringBuilder s = new StringBuilder("");
                 Map<UUID, Player> onlinePlayers = a.getServer().getOnlinePlayers();
@@ -233,7 +300,7 @@ public class KuQ extends IcqListener {
                 e.respond(a.getListMessage().replaceAll("%online_number%", "" + onlinePlayers.size()).replaceAll("%online_player%", s.toString()));
                 return;
             }
-
+            //申请白名单
             int i1 = message.indexOf(a.getWhiteList_Check());
             if (i1 != -1) {
                 if (a.isWhiteList_Enable()) {
@@ -245,15 +312,17 @@ public class KuQ extends IcqListener {
                     if (last != null) {
                         try {
                             a.getServer().getPlayer(last).kick();
-                            e.respond(a.getMessage_KickPlayer().replaceAll("%player%",last));
+                            e.respond(a.getMessage_KickPlayer().replaceAll("%player%", last));
                         } catch (NullPointerException ee) {
                             return;
                         }
                     }
                     return;
+                } else {
+                    e.respond(a.getMessage_NoEnable());
                 }
             }
-
+            //绑定玩家
             int i2 = message.indexOf(a.getPlayerBind_Check());
             if (i2 != -1) {
                 if (a.isPlayerBind_Enable()) {
@@ -268,9 +337,11 @@ public class KuQ extends IcqListener {
                     e.respond(a.getMessage_GroupConfirm());
                     Confirm.start(player, user);
                     return;
+                } else {
+                    e.respond(a.getMessage_NoEnable());
                 }
             }
-
+            //我的信息
             int i3 = message.indexOf(a.getPlayerInfo_Check());
             if (i3 != -1) {
                 if (a.isPlayerInfo_Enable()) {
@@ -280,24 +351,78 @@ public class KuQ extends IcqListener {
                         return;
                     }
 
-
                     String online = kuPlayer.getOfflinePlayer().isOnline() ? "在线" : "离线";
                     String money = a.getEconomy().hasAccount(kuPlayer.getOfflinePlayer()) ? String.valueOf(a.getEconomy().myMoney(kuPlayer.getOfflinePlayer())) : "无";
+                    String points = a.getPlayerPoints().containsKey(kuPlayer.getOfflinePlayer().getName())?String.valueOf(a.getPlayerPoints().get(kuPlayer.getOfflinePlayer().getName())) : "无";
                     StringBuilder s = new StringBuilder("");
                     for (String ss : a.getPlayerInfo_Message()) {
                         s.append(ss
                                 .replaceAll("%player%", kuPlayer.getOfflinePlayer().getName())
                                 .replaceAll("%money%", money)
+                                .replaceAll("%points%",points)
                                 .replaceAll("%online%", online)
-                                .replaceAll("%offline_time%", WxysUtil.toTime(kuPlayer.getOfflinePlayer().getLastPlayed()*1000))
-                                .replaceAll("%first_time%", WxysUtil.toTime(kuPlayer.getOfflinePlayer().getFirstPlayed()*1000)));
+                                .replaceAll("%offline_time%", WxysUtil.toTime(kuPlayer.getOfflinePlayer().getLastPlayed() * 1000))
+                                .replaceAll("%first_time%", WxysUtil.toTime(kuPlayer.getOfflinePlayer().getFirstPlayed() * 1000)));
                         s.append("\n");
                     }
 
                     e.respond(s.toString());
                     return;
+                } else {
+                    e.respond(a.getMessage_NoEnable());
+                }
+            }
+            //签到
+            int i4 = message.indexOf(a.getPlayerSign_Check());
+            if (i4 != -1) {
+                if (a.isPlayerSign_Enable()) {
+                    KuPlayer kuPlayer = a.getKuPlayer().get(String.valueOf(user));
+                    if (kuPlayer == null) {
+                        e.respond(a.getMessage_NoBind());
+                        return;
+                    }
+                    Long aLong = a.getPlayerSign_SignTime().get(kuPlayer.getOfflinePlayer().getName());
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.set(Calendar.HOUR_OF_DAY, 5);
+                    calendar.set(Calendar.SECOND, 0);
+                    calendar.set(Calendar.MINUTE, 0);
+                    calendar.set(Calendar.MILLISECOND, 0);
+                    calendar.add(Calendar.DAY_OF_MONTH, 1);
+                    long today = calendar.getTime().getTime();
+                    if (aLong == null) {
+                       sign(kuPlayer,today,e);
+                    } else {
+                        if (System.currentTimeMillis() >= aLong) {
+                            sign(kuPlayer,today,e);
+                        } else {
+                            e.respond(a.getPlayerSign_AlreadySign());
+                        }
+                    }
+                    return;
+                } else {
+                    e.respond(a.getMessage_NoEnable());
                 }
             }
         }
     }
+    private void sign(KuPlayer kuPlayer,long today,EventGroupMessage e){
+        a.getPlayerSign_SignTime().put(kuPlayer.getOfflinePlayer().getName(), today);
+        int points = 0;
+        int i5 = a.getPlayerSing_SignReward().indexOf("~");
+        if (i5 != -1) {
+            int min = Integer.valueOf(a.getPlayerSing_SignReward().split("~")[0]);
+            int max = Integer.valueOf(a.getPlayerSing_SignReward().split("~")[1]);
+            points = (int) (Math.floor(Math.random() * (max - min + 1)) + min);
+        } else {
+            try {
+                points = Integer.valueOf(a.getPlayerSing_SignReward());
+            } catch (NumberFormatException event) {
+                a.log("§c检查SignReward 签到奖励积分 必须为 数字~数字 或者纯数字");
+                event.printStackTrace();
+            }
+        }
+        a.getPlayerPoints().put(kuPlayer.getOfflinePlayer().getName(), points);
+        e.respond(a.getPlayerSign_Message().replaceAll("%reward%",""+points));
+    }
+
 }

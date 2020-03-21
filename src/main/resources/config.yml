@@ -1,3 +1,9 @@
+MainQQGroupTip:
+  Enable: true
+  Message:
+  - '[MyKuQ]加载成功!'
+  - '啦啦啦啦'
+  #主QQ群 插件加载完成提醒
 MainAdminQQGroup: 1008686886
 #主QQ群
 MainAdminQQ: 1008686886
@@ -72,6 +78,7 @@ PlayerInfo:
   Message:
   - '%player%个人信息'
   - '金币:%money%'
+  - '积分:%points%'
   - '状态:%online%'
   - '离线时间:%offline_time%'
   - '首次进服:%first_time%'
@@ -97,3 +104,78 @@ AdminCommands:
     Add: "add "
     Del: "del "
     List: "list"
+  Bind:
+    MainCommand: "/Bind "
+    Add: "add "
+    Del: "del "
+    List: "list"
+PlayerSign:
+  Enable: true
+  #是否开启
+  Check: "签到"
+  #检测头
+  ExChangeReward:
+    '金币':
+      Points: 100
+      #需要的积分
+      Commands:
+      - '[CMD]say hellow %player%'
+      - '[ACTION]§a2333%player%]10]70]20'
+      - '[TITLE]%player%]SubTitle]10]70]20'
+      #兑换成功执行的指令
+      #%player%玩家变量
+      #- '[CMD]后台执行的指令]'
+      #- '[TITLE]%player%]SubTitle]10]70]20'
+      #- '[TITLE]主标题]副标题]淡入时间]停留时间]淡出时间'
+      #- '[CHAT]我进来了啦啦啦'
+      #- '[CHAT]玩家发送的指令' #加/就是指令 不加就是消息
+      #- '[ACTION]§a2333%player%]10]70]20'
+      #- '[ACTION]发送的消息]淡入时间]停留时间]淡出时间'
+      #- '233333'
+      #- '233333 直接发送此段文字给玩家'
+      #- '[Bd]233'
+      #- '[Bd]服务器内广播消息'
+      #加/就是指令 不加就是发送文字
+      #注意[]后不能加空格
+    '钻石':
+      Points: 100
+      #需要的积分
+      Commands:
+      - '[CMD]say hellow %player%'
+      - '[ACTION]§a2333%player%]10]70]20'
+      - '[TITLE]%player%]SubTitle]10]70]20'
+      #兑换成功执行的指令
+      #%player%玩家变量
+      #- '[CMD]后台执行的指令]'
+      #- '[TITLE]%player%]SubTitle]10]70]20'
+      #- '[TITLE]主标题]副标题]淡入时间]停留时间]淡出时间'
+      #- '[CHAT]我进来了啦啦啦'
+      #- '[CHAT]玩家发送的指令' #加/就是指令 不加就是消息
+      #- '[ACTION]§a2333%player%]10]70]20'
+      #- '[ACTION]发送的消息]淡入时间]停留时间]淡出时间'
+      #- '233333'
+      #- '233333 直接发送此段文字给玩家'
+      #- '[Bd]233'
+      #- '[Bd]服务器内广播消息'
+      #加/就是指令 不加就是发送文字
+      #注意[]后不能加空格
+  ExChangeRewardSetting:
+    Title: "兑换商店    你当前积分%points%"
+    #%points%当前积分变量
+    PointsNotEnough: "积分点不足"
+    #积分不足提示
+    Success: "兑换%item%成功，花费%points%点积分"
+    Item: "物品:%item%  所需积分:%points%"
+    #物品介绍
+    Confirm: "点击选择购买"
+    #按钮坐标得字
+  SignReward: "1~100"
+  #签到奖励 1~100之间随机数字 包括1 和 100 如果不想随机就填数字
+  Message: '签到成功，获得%reward%'
+  #签到完成发送得话 %reward%获得多少积分点变量
+  AlreadySign: "你今天已经签到了~每日五点刷新签到噢~"
+CheckVersion:
+  Enable: true
+  #开启自动检测更新 不会强制下载
+  Time: 86400
+  #秒为单位

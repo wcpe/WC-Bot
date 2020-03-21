@@ -1,5 +1,8 @@
 package com.wcpe.MyKuQ.Utils;
 
+import cn.nukkit.Player;
+import cn.nukkit.Server;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -13,22 +16,68 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.ProtocolException;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 
 public class WxysUtil {
+
+
+    /**
+     * @author WCPE
+     * @apiNote 玩家执行指令
+     **/
+    public static void executionCommands(List<String> a, Player p) {
+        for (String commands : a) {
+            String pd[] = commands.split("]");
+            pd[1] = pd[1].replaceAll("%player%", p.getName());
+            if ("[CMD".equals(pd[0])) {
+                Server.getInstance().dispatchCommand(Server.getInstance().getConsoleSender(), pd[1]);
+            } else if ("[CHAT".equals(pd[0])) {
+                p.chat(pd[1]);
+            } else if ("[TITLE".equals(pd[0])) {
+                p.sendTitle(pd[1], pd[2], Integer.valueOf(pd[3]), Integer.valueOf(pd[4]), Integer.valueOf(pd[5]));
+            } else if ("[ACTION".equals(pd[0])) {
+                p.sendActionBar(pd[1], Integer.valueOf(pd[2]), Integer.valueOf(pd[3]), Integer.valueOf(pd[4]));
+            } else if ("[BD".equals(pd[0])) {
+                Server.getInstance().broadcastMessage(pd[1]);
+            } else {
+                p.sendMessage(pd[0]);
+            }
+        }
+    }
+
     /**
      * @return String
      * @author WCPE
      * @apiNote 时间戳转时间
      **/
     public static String toTime(long timeStamp) {
-        SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy年MM月dd日HH时mm分ss秒");
+        SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String sd2 = sdf2.format(new Date(Long.parseLong(String.valueOf(timeStamp))));
         return sd2;
     }
+
+    /**
+     * @return String
+     * @author WCPE
+     * @apiNote 时间转时间戳
+     **/
+    public static String toStamp(String s) throws ParseException {
+        String res;
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date date = simpleDateFormat.parse(s);
+        long ts = date.getTime();
+        res = String.valueOf(ts);
+        return res;
+    }
+
     /**
      * @return URL
      * @author WCPE
@@ -52,18 +101,12 @@ public class WxysUtil {
      * @author WCPE
      * @apiNote 读取URL内容
      **/
-    public static InputStream getImageStream(String url) {
-        try {
-            HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
-            connection.setReadTimeout(5000);
-            connection.setConnectTimeout(5000);
-            connection.setRequestMethod("GET");
-            if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
-                InputStream inputStream = connection.getInputStream();
-                return inputStream;
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+    public static InputStream getImageStream(String url) throws Exception {
+        HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+        connection.setRequestMethod("GET");
+        if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
+            InputStream inputStream = connection.getInputStream();
+            return inputStream;
         }
         return null;
     }

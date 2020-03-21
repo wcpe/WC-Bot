@@ -5,7 +5,7 @@ import cn.nukkit.Player;
 import cn.nukkit.event.EventHandler;
 import cn.nukkit.event.Listener;
 import cn.nukkit.event.player.PlayerChatEvent;
-import com.wcpe.MyKuQ.KuPlayer;
+import com.wcpe.MyKuQ.Obj.KuPlayer;
 import com.wcpe.MyKuQ.Main;
 
 import java.util.HashMap;

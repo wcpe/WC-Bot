@@ -1,7 +1,0 @@
-PlayerQuitGroup: "发现该退群玩家绑定的游戏id %player% 在线 踢出玩家成功~"
-KickPlayer: "发现该QQ上次申请的玩家白名单 %player% 在线 踢出玩家成功~"
-PlayerOffline: "玩家不存在或不在线~"
-GroupConfirm: "请在游戏中验证~"
-GameConfirm: "§6Q群内的: %qq% 用户正在绑定此账号\n§6请在聊天栏输入 confirm %qq% 以完成绑定\n§6如果非本人操作请忽略此消息\n§7十秒有效时间~!"
-GameConfirmFinish: "§a验证成功!"
-NoBind: "你没有绑定游戏账号~"

@@ -1,9 +1,0 @@
-com\wcpe\MyKuQ\Main.class
-com\wcpe\MyKuQ\Utils\Confirm.class
-com\wcpe\MyKuQ\KuQ.class
-com\wcpe\MyKuQ\Utils\WxysUtil.class
-net\kronos\rkon\core\ex\AuthenticationException.class
-net\kronos\rkon\core\Rcon.class
-com\wcpe\MyKuQ\KuPlayer.class
-net\kronos\rkon\core\RconPacket.class
-net\kronos\rkon\core\ex\MalformedPacketException.class

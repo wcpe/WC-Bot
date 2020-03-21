@@ -1,14 +1,16 @@
 name: MyKuQ
 main: com.wcpe.MyKuQ.Main
-version: "1.4.1"
+version: "1.5.0"
 api: ["1.0.5"]
 author: WCPE
 prefix: "MyKuQ"
 description: "我的酷Q"
+depend:
+  - "EconomyAPI"
 commands:
   mykuq:
     description: Example command
-    usage: "===== == MyKuQ 使用帮助 == =====\n/mykuq reload 重载插件\n/mykuq sendGroup <QQ群号> <消息> 发送消息至QQ群\n/mykuq sendQQ <QQ号> <消息> 发送消息至某QQ\n===== ===== ===== ====="
+    usage: "===== == MyKuQ 使用帮助 == =====\n/mykuq reload 重载插件\n/mykuq sendGroup <QQ群号> <消息> 发送消息至QQ群\n/mykuq sendQQ <QQ号> <消息> 发送消息至某QQ\n/mykuq exchange 打开兑换商店\n===== ===== ===== ====="
     aliases: ["mykuq", "mq"]
     permission: mykuq.use
     permission-message: "你没有权限使用!"
@@ -16,6 +18,9 @@ permissions:
   mykuq.use:
     description: "Allows the user to run the example command"
     default: OP
+  mykuq.player:
+    description: "Allows the user to run the example command"
+    default: true
 #   children:
 #     exampleplugin.command.example.test:
 #       description: "Use the test feature in the example command"

@@ -1,4 +1,4 @@
-package com.wcpe.MyKuQ;
+package com.wcpe.MyKuQ.Obj;
 
 import cn.nukkit.IPlayer;
 
