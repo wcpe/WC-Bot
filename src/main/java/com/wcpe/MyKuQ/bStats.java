@@ -255,8 +255,8 @@ public class bStats {
 
         data.addProperty("playerAmount", playerAmount);
         data.addProperty("onlineMode", onlineMode);
-        data.addProperty("bukkitVersion", "1.0");
-        data.addProperty("bukkitName", "Nukkit");
+        data.addProperty("bukkitVersion", bukkitVersion);
+        data.addProperty("bukkitName", bukkitName);
 
         data.addProperty("javaVersion", javaVersion);
         data.addProperty("osName", osName);

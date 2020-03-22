@@ -421,8 +421,8 @@ public class KuQ extends IcqListener {
                 event.printStackTrace();
             }
         }
-        a.getPlayerPoints().put(kuPlayer.getOfflinePlayer().getName(), points);
         e.respond(a.getPlayerSign_Message().replaceAll("%reward%",""+points));
+        points += a.getPlayerPoints().get(kuPlayer.getOfflinePlayer().getName()) == null?0:a.getPlayerPoints().get(kuPlayer.getOfflinePlayer().getName());
+        a.getPlayerPoints().put(kuPlayer.getOfflinePlayer().getName(), points);
     }
-
 }

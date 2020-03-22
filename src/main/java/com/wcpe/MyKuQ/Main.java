@@ -140,7 +140,7 @@ public class Main extends PluginBase implements Listener {
     private String Message_GameConfirmFinish;
     private String Message_NoBind;
     private String Message_NoEnable;
-    public final static double Version = 1.5;
+    public final static double Version = 1.51;
     public final Runnable updata = () -> {
         try {
             Config conf = UpCheck.upCheckVersion();
@@ -409,6 +409,9 @@ public class Main extends PluginBase implements Listener {
         a.load(this.getResource("config.yml"));
         Set<String> keys = this.getConfig().getKeys(true);
         for (String b : a.getKeys(true)) {
+            if(b.contains("ExChangeReward")){
+                continue;
+            }
             if (!keys.contains(b)) {
                 c++;
                 this.getConfig().set(b, a.get(b));
