@@ -30,7 +30,7 @@ Check:
   QQGroupCheck:
     Message: "服:"
     #发送至游戏内的检测文本
-    SendGameMessage: "[人工智障]%player%>>>%chat%"
+    SendGameMessage: "[人工智障]%player_name% %player%>>>%chat%"
     isIDorName: true
     #为true发送至游戏内就是QQ号 为false发送至游戏内就是QQ群昵称
     isRemoveColor: true
@@ -48,14 +48,6 @@ System:
   Ip: "127.0.0.1"
   Port: 5700
   #Http上报地址
-Rcon:
-  Enable: false
-  Ip: "0.0.0.0"
-  Port: 19132
-  Password: "abcde"
-  Private: true
-  #只允许私聊使用 还是群聊 私聊都行
-  #true为只允许私聊 false为都行
 WhiteList:
   Enable: true
   #是否开启
@@ -70,11 +62,15 @@ PlayerBind:
   #检测头
   Message: "绑定成功~"
   #绑定成功提示
+  ConfirmTime: 10
+  #绑定验证时间 10s 秒为单位
 PlayerInfo:
   Enable: true
   #是否开启
   Check: "我的信息"
   #检测头
+  ConfirmTime: 20
+  #秒为单位 20 为 20秒
   Message:
   - '%player%个人信息'
   - '金币:%money%'
@@ -82,6 +78,7 @@ PlayerInfo:
   - '状态:%online%'
   - '离线时间:%offline_time%'
   - '首次进服:%first_time%'
+  - '签到天数:%sign_timer%'
   #信息
 AdminCommands:
   #管理员指令列表
@@ -96,19 +93,40 @@ AdminCommands:
     #列表
   Admin:
     MainCommand: "/Admin "
+    #主指令
     Add: "add "
+    #添加
     Del: "del "
+    #删除
     List: "list"
+    #列表
   Group:
     MainCommand: "/Group "
+    #主指令
     Add: "add "
+    #添加
     Del: "del "
+    #删除
     List: "list"
+    #列表
   Bind:
     MainCommand: "/Bind "
+    #主指令
     Add: "add "
+    #添加
     Del: "del "
+    #删除
     List: "list"
+    #列表
+  Point:
+    MainCommand: "/Point "
+    #主指令
+    Add: "add "
+    #添加
+    Del: "del "
+    #删除
+    Check: "check "
+    #查询
 PlayerSign:
   Enable: true
   #是否开启
@@ -174,6 +192,28 @@ PlayerSign:
   Message: '签到成功，获得%reward%'
   #签到完成发送得话 %reward%获得多少积分点变量
   AlreadySign: "你今天已经签到了~每日五点刷新签到噢~"
+PlayerGameTime:
+  Enable: true
+  Type: 'M'
+  #D或H或M或S
+  #天 时 分 秒
+  #例:如果为s就是一秒加一点 h就是一小时加一点
+  #此处 %player% 玩家变量
+  #     %pmdh% 兑换的在线时间
+  #     %pmsy% 剩余在线时间
+  #Ps:变量为以下Command Messag适用
+  Command:
+    - 'say <%pmdh%>'
+  Message:
+    - '名字:%player% '
+    - '兑换的在线时间:%pmdh% '
+    - '剩余在线时间:%pmsy% '
+  #注意command里面 值可<1+1*5> 必须打上尖括号
+Sudo:
+  Enable: true
+  #是否开启 机器人原创控制台
+  MainCommand: "sudo:"
+  #主指令 例：sudo:list
 CheckVersion:
   Enable: true
   #开启自动检测更新 不会强制下载

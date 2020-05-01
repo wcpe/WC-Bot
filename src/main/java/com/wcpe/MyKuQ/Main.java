@@ -8,6 +8,7 @@ import cc.moecraft.icq.sender.returndata.returnpojo.get.RFriend;
 import cc.moecraft.icq.sender.returndata.returnpojo.get.RGroup;
 import cn.hutool.json.JSONObject;
 import cn.nukkit.Player;
+import cn.nukkit.Server;
 import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.event.EventHandler;
@@ -29,15 +30,21 @@ import com.wcpe.MyKuQ.Utils.Confirm;
 import com.wcpe.MyKuQ.Utils.UpCheck;
 import com.wcpe.MyKuQ.Utils.WxysUtil;
 import me.onebone.economyapi.EconomyAPI;
-import net.kronos.rkon.core.Rcon;
-import net.kronos.rkon.core.ex.AuthenticationException;
 
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
 
 public class Main extends PluginBase implements Listener {
+
+    public static Main instance;
+
+    public static Main getInstance() {
+        return instance;
+    }
 
     private EconomyAPI economy;
 
@@ -71,12 +78,6 @@ public class Main extends PluginBase implements Listener {
     private String System_IP;
     private int System_PORT;
 
-    private boolean Rcon_Enable;
-    private String Rcon_IP;
-    private int Rcon_PORT;
-    private String Rcon_PASSWORD;
-    private boolean isPrivate;
-
     private boolean WhiteList_Enable;
     private String WhiteList_Check;
     private String WhiteList_Message;
@@ -84,9 +85,11 @@ public class Main extends PluginBase implements Listener {
     private boolean PlayerBind_Enable;
     private String PlayerBind_Check;
     private String PlayerBind_Message;
+    private int PlayerBind_ConfirmTime;
 
     private boolean PlayerInfo_Enable;
     private String PlayerInfo_Check;
+    private int PlayerInfo_ConfirmTime;
     private List<String> PlayerInfo_Message;
 
     private List<Long> Admin;
@@ -107,7 +110,8 @@ public class Main extends PluginBase implements Listener {
     private String PlayerSign_ExChangeRewardSetting_Item;
     private String PlayerSign_ExChangeRewardSetting_Confirm;
     private String PlayerSing_SignReward;
-    private HashMap<String, Long> PlayerSign_SignTime = new HashMap<>();
+    private HashMap<String, Long> PlayerSign_SignData = new HashMap<>();
+    private HashMap<String, Integer> PlayerSign_SignTimer = new HashMap<>();
     private HashMap<String, Integer> PlayerPoints = new HashMap<>();
 
     private String Admins_White;
@@ -130,6 +134,21 @@ public class Main extends PluginBase implements Listener {
     private String Admins_Bind_del;
     private String Admins_Bind_list;
 
+    private String Admins_Point;
+    private String Admins_Point_add;
+    private String Admins_Point_del;
+    private String Admins_Point_check;
+
+    private boolean Sudo_Enable;
+    private String Admins_Sudo;
+
+    private boolean PlayerGameTime_Enable;
+    private String PlayerGameTime_Type;
+    private List<String> PlayerGameTime_Command;
+    private List<String> PlayerGameTime_Message;
+    private HashMap<String,Long> PlayerGameTime = new HashMap<>();
+
+
     //
 
     private String Message_PlayerQuitGroup;
@@ -140,7 +159,7 @@ public class Main extends PluginBase implements Listener {
     private String Message_GameConfirmFinish;
     private String Message_NoBind;
     private String Message_NoEnable;
-    public final static double Version = 1.51;
+    public final static double Version = 1.6;
     public final Runnable updata = () -> {
         try {
             Config conf = UpCheck.upCheckVersion();
@@ -179,6 +198,7 @@ public class Main extends PluginBase implements Listener {
 
     @Override
     public void onEnable() {
+        instance = this;
         new bStats(this, 6812);
         log("开始加载EconomyApi!");
         loadEconomyAPI();
@@ -188,10 +208,6 @@ public class Main extends PluginBase implements Listener {
         reload();
         log("开始加载酷Q!");
         loadKuQ();
-        if (isRcon_Enable()) {
-            log("开始加载Rcon!");
-            loadRcon();
-        }
         timeUpCheck();
         getServer().getPluginManager().registerEvents(this, this);
         getServer().getPluginManager().registerEvents(new Confirm(this), this);
@@ -200,7 +216,7 @@ public class Main extends PluginBase implements Listener {
         log("§3	 / /|_/ / // / ,< / // / /_/ /");
         log("§4	/_/  /_/\\_, /_/|_|\\_,_/\\___\\_\\");
         log("§5	       /___/                  ");
-        log("§6              §aVersion: 1.5.0      ");
+        log("§6              §aVersion: 1.6.0      ");
         log("MyKuQ 加载完成");
     }
 
@@ -247,12 +263,6 @@ public class Main extends PluginBase implements Listener {
         this.System_IP = this.getConfig().getString("System.Ip", "127.0.0.1");
         this.System_PORT = this.getConfig().getInt("System.Port", 5700);
 
-        this.Rcon_Enable = this.getConfig().getBoolean("Rcon.Enable", false);
-        this.Rcon_IP = this.getConfig().getString("Rcon.Ip", "0.0.0.0");
-        this.Rcon_PORT = this.getConfig().getInt("Rcon.Port", 19132);
-        this.Rcon_PASSWORD = this.getConfig().getString("Rcon.Password", "abcde");
-        this.isPrivate = this.getConfig().getBoolean("Rcon.Private", true);
-
         this.WhiteList_Enable = this.getConfig().getBoolean("WhiteList.Enable", true);
         this.WhiteList_Check = this.getConfig().getString("WhiteList.Check", "申请白名单:");
         this.WhiteList_Message = this.getConfig().getString("WhiteList.Message", "%player%成功申请了白名单~");
@@ -260,9 +270,11 @@ public class Main extends PluginBase implements Listener {
         this.PlayerBind_Enable = this.getConfig().getBoolean("PlayerBind.Enable", true);
         this.PlayerBind_Check = this.getConfig().getString("PlayerBind.Check", "绑定:");
         this.PlayerBind_Message = this.getConfig().getString("PlayerBind.Message", "绑定成功~");
+        this.PlayerBind_ConfirmTime = this.getConfig().getInt("PlayerBind.ConfirmTime", 10);
 
         this.PlayerInfo_Enable = this.getConfig().getBoolean("PlayerInfo.Enable", true);
         this.PlayerInfo_Check = this.getConfig().getString("PlayerInfo.Check", "我的信息");
+        this.PlayerInfo_ConfirmTime = this.getConfig().getInt("PlayerInfo.ConfirmTime", 20);
         this.PlayerInfo_Message = this.getConfig().getStringList("PlayerInfo.Message");
 
         this.PlayerSign_Enable = this.getConfig().getBoolean("PlayerSign.Enable", true);
@@ -281,6 +293,11 @@ public class Main extends PluginBase implements Listener {
         this.PlayerSign_ExChangeRewardSetting_Item = this.getConfig().getString("PlayerSign.ExChangeRewardSetting.Item");
         this.PlayerSign_ExChangeRewardSetting_Confirm = this.getConfig().getString("PlayerSign.ExChangeRewardSetting.Confirm");
 
+        this.PlayerGameTime_Enable = this.getConfig().getBoolean("PlayerGameTime.Enable");
+        this.PlayerGameTime_Type = this.getConfig().getString("PlayerGameTime.Type");
+        this.PlayerGameTime_Command = this.getConfig().getStringList("PlayerGameTime.Command");
+        this.PlayerGameTime_Message = this.getConfig().getStringList("PlayerGameTime.Message");
+
         Config data = new Config(new File(this.getDataFolder(), "data.yml"));
         this.Admin = data.getLongList("AdminQQ");
         this.QQGroup = data.getLongList("QQGroup");
@@ -296,7 +313,13 @@ public class Main extends PluginBase implements Listener {
             }
         }
         if (data.get("PlayerSignData") != null) {
-            PlayerSign_SignTime = (HashMap<String, Long>) data.get("PlayerSignData");
+            PlayerSign_SignData = (HashMap<String, Long>) data.get("PlayerSignData");
+        }
+        if (data.get("PlayerSignTimer") != null) {
+            PlayerSign_SignTimer = (HashMap<String, Integer>) data.get("PlayerSignTimer");
+        }
+        if (data.get("PlayerGameTime") != null) {
+            PlayerGameTime = (HashMap<String, Long>) data.get("PlayerGameTime");
         }
         if (data.get("PlayerPoints") != null) {
             PlayerPoints = (HashMap<String, Integer>) data.get("PlayerPoints");
@@ -323,11 +346,18 @@ public class Main extends PluginBase implements Listener {
         this.Admins_Bind_del = this.getConfig().getString("AdminCommands.Bind.Del");
         this.Admins_Bind_list = this.getConfig().getString("AdminCommands.Bind.List");
 
+        this.Admins_Point = this.getConfig().getString("AdminCommands.Point.MainCommand");
+        this.Admins_Point_add = this.getConfig().getString("AdminCommands.Point.Add");
+        this.Admins_Point_del = this.getConfig().getString("AdminCommands.Point.Del");
+        this.Admins_Point_check = this.getConfig().getString("AdminCommands.Point.Check");
+
+        this.Sudo_Enable = this.getConfig().getBoolean("Sudo.Enable", true);
+        this.Admins_Sudo = this.getConfig().getString("Sudo.MainCommand", "sudo:");
+
         this.CheckVersion_Enable = this.getConfig().getBoolean("CheckVersion.Enable");
-        ;
         this.CheckVersion_Timer = this.getConfig().getInt("CheckVersion.Time");
-        ;
         reloadMessage();
+        loadPlayerGameTime();
     }
 
     private void reloadMessage() {
@@ -376,17 +406,6 @@ public class Main extends PluginBase implements Listener {
         }
     }
 
-    private Rcon rcon;
-
-    private void loadRcon() {
-        try {
-            rcon = new Rcon(Rcon_IP, Rcon_PORT, Rcon_PASSWORD.getBytes());
-        } catch (IOException | AuthenticationException e) {
-            log("§cRCON未连接上 请检查端口 密码");
-            e.printStackTrace();
-        }
-    }
-
     private void savedata() {
         File file = new File(this.getDataFolder(), "data.yml");
         Config data = new Config(file);
@@ -398,7 +417,9 @@ public class Main extends PluginBase implements Listener {
             kuplayer.put(stringKuPlayerEntry.getKey(), stringKuPlayerEntry.getValue().getOfflinePlayer().getUniqueId().toString());
         }
         data.set("KuPlayer", kuplayer);
-        data.set("PlayerSignData", PlayerSign_SignTime);
+        data.set("PlayerSignData", PlayerSign_SignData);
+        data.set("PlayerSignTimer", PlayerSign_SignTimer);
+        data.set("PlayerGameTime", PlayerGameTime);
         data.set("PlayerPoints", PlayerPoints);
         data.save(file);
     }
@@ -409,7 +430,7 @@ public class Main extends PluginBase implements Listener {
         a.load(this.getResource("config.yml"));
         Set<String> keys = this.getConfig().getKeys(true);
         for (String b : a.getKeys(true)) {
-            if(b.contains("ExChangeReward")){
+            if (b.contains("ExChangeReward")) {
                 continue;
             }
             if (!keys.contains(b)) {
@@ -417,7 +438,7 @@ public class Main extends PluginBase implements Listener {
                 this.getConfig().set(b, a.get(b));
             }
         }
-        log("共更新了"+c+"个插件配置");
+        log("共更新了" + c + "个插件配置");
         saveConfig();
     }
 
@@ -433,9 +454,10 @@ public class Main extends PluginBase implements Listener {
                 mess.set(b, a.get(b));
             }
         }
-        log("共更新了"+c+"个消息配置");
+        log("共更新了" + c + "个消息配置");
         mess.save();
     }
+
     private void loadEconomyAPI() {
         try {
             if (getServer().getPluginManager().getPlugin("EconomyAPI") != null) {
@@ -448,9 +470,35 @@ public class Main extends PluginBase implements Listener {
         }
     }
 
+    private void loadPlayerGameTime() {
+        if (PlayerGameTime_Enable) {
+            int a = 0;
+            String pmtype = PlayerGameTime_Type;
+            if (pmtype.equalsIgnoreCase("D")) {
+                a = 20 * 60 * 60 * 24;
+            } else if (pmtype.equalsIgnoreCase("H")) {
+                a = 20 * 60 * 60;
+            } else if (pmtype.equalsIgnoreCase("M")) {
+                a = 20 * 60;
+            } else if (pmtype.equalsIgnoreCase("S")) {
+                a = 20;
+            }
+            if (a != 0) {
+                Server.getInstance().getScheduler().scheduleDelayedRepeatingTask(this, () -> {
+                    for (Map.Entry<UUID, Player> p : getServer().getOnlinePlayers().entrySet()) {
+                        long b = PlayerGameTime.get(p.getValue().getName()) != null ? (PlayerGameTime.get(p.getValue().getName()) + 1) : 0;
+                        PlayerGameTime.put(p.getValue().getName(), b);
+                    }
+                }, 0, a);
+            } else {
+                log("§c在线奖励关闭 请检查插件配置文件中在线时间Type");
+            }
+        }
+    }
+
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (args.length == 1) {
+       if (args.length == 1) {
             if (args[0].equals("reload")) {
                 if (!sender.hasPermission("mykuq.use")) {
                     sender.sendMessage("§c您没得权限!");
@@ -459,16 +507,9 @@ public class Main extends PluginBase implements Listener {
                 reload();
                 loadKuQ();
                 savedata();
-                if (isRcon_Enable()) {
-                    loadRcon();
-                }
                 return true;
             } else if (args[0].equals("exchange")) {
                 if (PlayerSign_Enable) {
-                    if (!sender.hasPermission("mykuq.player")) {
-                        sender.sendMessage("§c您没得权限!");
-                        return true;
-                    }
                     if (!(sender instanceof Player)) {
                         sender.sendMessage("§c这个指令只能玩家使用");
                         return true;
@@ -486,8 +527,71 @@ public class Main extends PluginBase implements Listener {
                     sender.sendMessage(Message_NoEnable);
                 }
                 return true;
+            }else if("gametime".equals(args[0])){
+                if (!(sender instanceof Player)) {
+                    sender.sendMessage("§c这个指令只能玩家使用");
+                    return true;
+                }
+                Player p = (Player) sender;
+                p.sendMessage("&a您当前剩余可兑换在线时间为:&e&l%time%".replaceAll("%time%", PlayerGameTime.get(p.getName()) != null ?""+PlayerGameTime.get(p.getName()) : ""+0));
+                return true;
             }
             return false;
+        } else if (args.length == 2) {
+            if (!(sender instanceof Player)) {
+                sender.sendMessage("§c这个指令只能玩家使用");
+                return true;
+            }
+            Player p = (Player) sender;
+            long s = PlayerGameTime.get(p.getName()) != null ?PlayerGameTime.get(p.getName()) : 0;
+            if (args[0].equals("gametime" +
+                    "") && args[1] != null) {
+                int ss;
+                try {
+                    ss = Integer.valueOf(args[1]);
+                    if (ss > s || ss < 0) {
+                        p.sendMessage("&c输入错误,&a您当前剩余可兑换在线时间为:&e&l%time%"
+                                .replaceAll("%time%", s + PlayerGameTime_Type));
+                        return true;
+                    }
+                } catch (Exception e1) {
+                    p.sendMessage("&4使用错误 &a格式:\n/mykuq gametime &e查询剩余可兑换在线时间~\n/mykuq gametime <兑换的在线时间>&e兑换在线时间奖励~");
+                    return true;
+                }
+                long cha = s - ss;
+                PlayerGameTime.put(p.getName(), cha);
+                List<String> listcommand = PlayerGameTime_Command;
+                List<String> listmessage = PlayerGameTime_Message;
+                for(String cd:listcommand) {
+                    cd = cd.replaceAll("%player%", p.getName());
+                    cd = cd.replaceAll("%pmdh%", String.valueOf(ss));
+                    cd = cd.replaceAll("%pmsy%", String.valueOf(cha));
+                    try {
+                        String sourceArray = cd.substring(cd.indexOf("<")+1, cd.indexOf(">"));
+                        int returns = 0;
+                        try {
+                            returns = (int)new ScriptEngineManager().getEngineByName("JavaScript").eval(sourceArray);
+                        }catch(NullPointerException e) {
+                            returns = Integer.valueOf(sourceArray);
+                        }
+                        sourceArray = "<"+sourceArray+">";
+                        cd = cd.replace(sourceArray, String.valueOf(returns));
+                        getServer().dispatchCommand(getServer().getConsoleSender(), cd);
+                    } catch (ScriptException e) {
+                        p.sendMessage("§4请检查配置中表达式是否正确");
+                    }
+                }
+                for(String mg:listmessage) {
+                    mg = mg.replaceAll("%player%", p.getName());
+                    mg = mg.replaceAll("%pmdh%", String.valueOf(ss));
+                    mg = mg.replaceAll("%pmsy%", String.valueOf(cha));
+                    p.sendMessage(mg);
+                }
+
+            } else {
+                p.sendMessage("&4使用错误 &a格式:\n/mykuq gametime &e查询剩余可兑换在线时间~\n/mykuq gametime <兑换的在线时间>&e兑换在线时间奖励~");
+
+            }
         } else if (args.length == 3) {
             if (args[0].equals("sendQQ") && args[1] != null && args[2] != null) {
                 if (!sender.hasPermission("mykuq.use")) {
@@ -599,8 +703,16 @@ public class Main extends PluginBase implements Listener {
         }
     }
 
-    public HashMap<String, Long> getPlayerSign_SignTime() {
-        return PlayerSign_SignTime;
+    public int getPlayerBind_ConfirmTime() {
+        return PlayerBind_ConfirmTime;
+    }
+
+    public int getPlayerInfo_ConfirmTime() {
+        return PlayerInfo_ConfirmTime;
+    }
+
+    public HashMap<String, Long> getPlayerSign_SignData() {
+        return PlayerSign_SignData;
     }
 
     public String getPlayerSign_ExChangeRewardSetting_Title() {
@@ -617,6 +729,26 @@ public class Main extends PluginBase implements Listener {
 
     public String getPlayerSign_ExChangeRewardSetting_Item() {
         return PlayerSign_ExChangeRewardSetting_Item;
+    }
+
+    public HashMap<String, Integer> getPlayerSign_SignTimer() {
+        return PlayerSign_SignTimer;
+    }
+
+    public String getAdmins_Point() {
+        return Admins_Point;
+    }
+
+    public String getAdmins_Point_add() {
+        return Admins_Point_add;
+    }
+
+    public String getAdmins_Point_del() {
+        return Admins_Point_del;
+    }
+
+    public String getAdmins_Point_check() {
+        return Admins_Point_check;
     }
 
     public String getPlayerSign_ExChangeRewardSetting_Confirm() {
@@ -836,6 +968,26 @@ public class Main extends PluginBase implements Listener {
         return PlayerJoinMessage;
     }
 
+    public boolean isPlayerGameTime_Enable() {
+        return PlayerGameTime_Enable;
+    }
+
+    public String getPlayerGameTime_Type() {
+        return PlayerGameTime_Type;
+    }
+
+    public List<String> getPlayerGameTime_Command() {
+        return PlayerGameTime_Command;
+    }
+
+    public List<String> getPlayerGameTime_Message() {
+        return PlayerGameTime_Message;
+    }
+
+    public HashMap<String, Long> getPlayerGameTime() {
+        return PlayerGameTime;
+    }
+
     public boolean isPlayerJoinMessage() {
         return isPlayerJoinMessage;
     }
@@ -912,25 +1064,6 @@ public class Main extends PluginBase implements Listener {
         return System_PORT;
     }
 
-    public boolean isRcon_Enable() {
-        return Rcon_Enable;
-    }
-
-    public String getRcon_IP() {
-        return Rcon_IP;
-    }
-
-    public int getRcon_PORT() {
-        return Rcon_PORT;
-    }
-
-    public String getRcon_PASSWORD() {
-        return Rcon_PASSWORD;
-    }
-
-    public boolean isPrivate() {
-        return isPrivate;
-    }
 
     public List<Long> getAdmin() {
         return Admin;
@@ -944,6 +1077,14 @@ public class Main extends PluginBase implements Listener {
         return bot;
     }
 
+    public boolean isSudo_Enable() {
+        return Sudo_Enable;
+    }
+
+    public String getAdmins_Sudo() {
+        return Admins_Sudo;
+    }
+
     public BotAccount getMyMcBot() {
         return myMcBot;
     }
@@ -952,7 +1093,4 @@ public class Main extends PluginBase implements Listener {
         return a;
     }
 
-    public Rcon getRcon() {
-        return rcon;
-    }
 }

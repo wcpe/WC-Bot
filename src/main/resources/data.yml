@@ -6,3 +6,5 @@ WhiteList: {}
 KuPlayer: {}
 PlayerSignData: {}
 PlayerPoints: {}
+PlayerSignTimer: {}
+PlayerGameTime: {}

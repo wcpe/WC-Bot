@@ -38,7 +38,7 @@ public class Confirm implements Listener {
         codes.put(p.getUniqueId(), qq);
         a.getServer().getScheduler().scheduleDelayedTask(a,()->{
             codes.remove(p.getUniqueId());
-        },10*20);
+        },a.getPlayerInfo_ConfirmTime()*20);
         p.sendMessage(a.getMessage_GameConfirm().replaceAll("%qq%",""+qq));
     }
 

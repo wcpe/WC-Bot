@@ -12,10 +12,9 @@ import com.wcpe.MyKuQ.Obj.KuPlayer;
 import com.wcpe.MyKuQ.Utils.Confirm;
 import com.wcpe.MyKuQ.Utils.WxysUtil;
 
-import java.io.IOException;
+
 import java.util.Calendar;
 import java.util.Map;
-import java.util.Random;
 import java.util.UUID;
 
 public class KuQ extends IcqListener {
@@ -48,38 +47,44 @@ public class KuQ extends IcqListener {
         long user = e.getSender().getId();
         String message = e.getMessage();
         if (user == a.getMainAdminQQ() || a.getAdmin().contains(user)) {
-            if (a.isRcon_Enable()) {
-                if (message.contains("cmd:")) {
-                    message = message.substring(4);
-                    String result = null;
-                    try {
-                        result = a.getRcon().command(message);
-                    } catch (IOException ex) {
-                        ex.printStackTrace();
-                    }
-                    e.respond(result);
+            if (a.isSudo_Enable()) {
+                if (message.contains(a.getAdmins_Sudo())) {
+                    String finalMessage = message.substring(a.getAdmins_Sudo().length());
+                    Server.getInstance().getScheduler().scheduleTask(Main.getInstance(), () -> {
+                        Server.getInstance().dispatchCommand(MyKuQApi.getConsoleSender(), finalMessage);
+                    });
+                    return;
                 }
             }
+
             if (user == a.getMainAdminQQ()) {
                 String Admin_add = a.getAdmins_Admin() + a.getAdmins_Admin_add();
                 int admin_add = message.indexOf(Admin_add);
                 if (admin_add != -1) {
-                    String s = message.substring(admin_add + Admin_add.length());
-                    a.getAdmin().add(Long.valueOf(s));
-                    e.respond("添加" + s + "为管理员成功!");
-                    return;
+                    try {
+                        String s = message.substring(admin_add + Admin_add.length());
+                        a.getAdmin().add(Long.valueOf(s));
+                        e.respond("添加" + s + "为管理员成功!");
+                        return;
+                    } catch (Exception ee) {
+                        e.respond("使用方法:/" + a.getAdmins_Admin() + " " + a.getAdmins_Admin_add() + " QQ号");
+                    }
                 }
                 String Admin_del = a.getAdmins_Admin() + a.getAdmins_Admin_del();
                 int admin_del = message.indexOf(Admin_del);
                 if (admin_del != -1) {
-                    String s = message.substring(admin_del + Admin_del.length());
-                    if (a.getAdmin().contains(s)) {
-                        a.getAdmin().remove(Long.valueOf(s));
-                        e.respond("将" + s + "从管理员列表删除成功!");
-                        return;
-                    } else {
-                        e.respond(s + "不在管理员列表内!");
-                        return;
+                    try {
+                        String s = message.substring(admin_del + Admin_del.length());
+                        if (a.getAdmin().contains(Long.valueOf(s))) {
+                            a.getAdmin().remove(Long.valueOf(s));
+                            e.respond("将" + s + "从管理员列表删除成功!");
+                            return;
+                        } else {
+                            e.respond(s + "不在管理员列表内!");
+                            return;
+                        }
+                    } catch (Exception ee) {
+                        e.respond("使用方法:/" + a.getAdmins_Admin() + " " + a.getAdmins_Admin_del() + " QQ号");
                     }
                 }
                 String Admin_list = a.getAdmins_Admin() + a.getAdmins_Admin_list();
@@ -91,30 +96,37 @@ public class KuQ extends IcqListener {
                 String Group_add = a.getAdmins_Group() + a.getAdmins_Group_add();
                 int group_add = message.indexOf(Group_add);
                 if (group_add != -1) {
-                    String s = message.substring(group_add + Group_add.length(), message.length());
-                    for (RGroup b : a.getA().getGroupList().getData()) {
-                        if (String.valueOf(b.getGroupId()).equals(s)) {
-                            a.getQQGroup().add(Long.valueOf(s));
-                            e.respond("添加" + s + "到服务器群列表成功!");
-                            return;
+                    try {
+                        String s = message.substring(group_add + Group_add.length(), message.length());
+                        for (RGroup b : a.getA().getGroupList().getData()) {
+                            if (String.valueOf(b.getGroupId()).equals(s)) {
+                                a.getQQGroup().add(Long.valueOf(s));
+                                e.respond("添加" + s + "到服务器群列表成功!");
+                                return;
+                            }
                         }
+                        e.respond("添加" + s + "到服务器群列表失败!\n该群不在QQ群聊列表中");
+                        return;
+                    } catch (Exception ee) {
+                        e.respond("使用方法:/" + a.getAdmins_Group() + " " + a.getAdmins_Group_add() + " 群号");
                     }
-                    e.respond("添加" + s + "到服务器群列表失败!\n该群不在QQ群聊列表中");
-                    return;
                 }
                 String Group_del = a.getAdmins_Group() + a.getAdmins_Group_del();
                 int group_del = message.indexOf(Group_del);
                 if (group_del != -1) {
-                    String s = message.substring(group_del + Group_del.length(), message.length());
-                    if (a.getQQGroup().contains(Long.valueOf(s))) {
-                        a.getQQGroup().remove(Long.valueOf(s));
-                        e.respond("将" + s + "从管理员群列表删除成功!");
-                        return;
-                    } else {
-                        e.respond("删除" + s + "到服务器群列表失败!\n该群不在管理群聊列表中");
-                        return;
+                    try {
+                        String s = message.substring(group_del + Group_del.length(), message.length());
+                        if (a.getQQGroup().contains(Long.valueOf(s))) {
+                            a.getQQGroup().remove(Long.valueOf(s));
+                            e.respond("将" + s + "从管理员群列表删除成功!");
+                            return;
+                        } else {
+                            e.respond("删除" + s + "到服务器群列表失败!\n该群不在管理群聊列表中");
+                            return;
+                        }
+                    } catch (Exception ee) {
+                        e.respond("使用方法:/" + a.getAdmins_Group() + " " + a.getAdmins_Group_del() + "群号");
                     }
-
                 }
                 String Group_list = a.getAdmins_Group() + a.getAdmins_Group_list();
                 int group_list = message.indexOf(Group_list);
@@ -123,6 +135,7 @@ public class KuQ extends IcqListener {
                     return;
                 }
             }
+
             String White_add = a.getAdmins_White() + a.getAdmins_White_add();
             int white_add = message.indexOf(White_add);
             if (white_add != -1) {
@@ -201,7 +214,7 @@ public class KuQ extends IcqListener {
                     String s = message.substring(bind_del + Bind_del.length());
                     if (a.getKuPlayer().containsKey(s)) {
                         a.getKuPlayer().remove(s);
-                        e.respond("将" + s + "从白名单删除成功!");
+                        e.respond("将" + s + "删除成功!");
                         return;
                     } else {
                         e.respond(s + "玩家未绑定!");
@@ -215,13 +228,56 @@ public class KuQ extends IcqListener {
             if (bind_list != -1) {
                 StringBuilder sb = new StringBuilder();
                 a.getKuPlayer().entrySet().forEach((s) -> {
-                    sb.append("QQ:"+s.getKey() +" 绑定:"+s.getValue().getOfflinePlayer().getName()+"\n");
+                    sb.append("QQ:" + s.getKey() + " 绑定:" + s.getValue().getOfflinePlayer().getName() + "\n");
                 });
                 sb.setCharAt(sb.length() - 1, '\0');
                 e.respond("玩家绑定列表:\n" + sb.toString());
                 return;
             }
 
+            String Point_add = a.getAdmins_Point() + a.getAdmins_Point_add();
+            int point_add = message.indexOf(Point_add);
+            if (point_add != -1) {
+                try {
+                    String s = message.substring(point_add + Point_add.length());
+                    String[] s1 = s.split(" ");
+                    KuPlayer kuPlayer = a.getKuPlayer().get(s1[0]);
+                    MyKuQApi.addPoints(kuPlayer, Integer.valueOf(s1[1]));
+                    e.respond("添加玩家:" + kuPlayer.getOfflinePlayer().getName() + " 积分:" + s1[1] + "成功");
+                    return;
+                } catch (Exception ee) {
+                    e.respond("使用方法:/Point add QQ号 积分");
+                }
+            }
+
+            String Point_del = a.getAdmins_Point() + a.getAdmins_Point_del();
+            int point_del = message.indexOf(Point_del);
+            if (point_del != -1) {
+                try {
+                    String s = message.substring(point_del + Point_del.length());
+                    String[] s1 = s.split(" ");
+                    KuPlayer kuPlayer = a.getKuPlayer().get(s1[0]);
+                    MyKuQApi.delPoints(kuPlayer, Integer.valueOf(s1[1]));
+                    e.respond("减少玩家:" + kuPlayer.getOfflinePlayer().getName() + " 积分:" + s1[1] + "成功");
+                    return;
+                } catch (Exception ee) {
+                    e.respond("使用方法:/Point del QQ号 积分");
+                }
+            }
+
+            String Point_check = a.getAdmins_Point() + a.getAdmins_Point_check();
+            int point_check = message.indexOf(Point_check);
+            if (point_check != -1) {
+                try {
+                    String s = message.substring(point_check + Point_check.length());
+                    String[] s1 = s.split(" ");
+                    KuPlayer kuPlayer = a.getKuPlayer().get(s1[0]);
+                    e.respond("玩家:" + kuPlayer.getOfflinePlayer().getName() + " 积分:" + a.getPlayerPoints().get(kuPlayer.getOfflinePlayer().getName()));
+                    return;
+                } catch (Exception ee) {
+                    e.respond("使用方法:/Point check QQ号");
+                }
+            }
         }
     }
 
@@ -234,30 +290,24 @@ public class KuQ extends IcqListener {
     }
 
     @EventHandler
-    public void AdminGroupMessage(EventGroupMessage e) {
+    public void adminGroupMessage(EventGroupMessage e) {
         long group = e.getGroup().getId();
         if (isGroupList(group)) {
             long user = e.getSender().getId();
             String message = e.getMessage();
-            if (a.isRcon_Enable() && a.isPrivate()) {
-                if (user == a.getMainAdminQQ() && message.contains("cmd:")) {
-                    message = message.substring(4);
-                    String result = null;
-                    try {
-                        result = a.getRcon().command(message);
-                    } catch (IOException ex) {
-                        ex.printStackTrace();
-                    }
-                    e.respond(result);
-                    return;
-                }
+            if (user == a.getMainAdminQQ() && a.isSudo_Enable() && message.contains(a.getAdmins_Sudo())) {
+                String finalMessage = message.substring(a.getAdmins_Sudo().length());
+                Server.getInstance().getScheduler().scheduleTask(Main.getInstance(), () -> {
+                    Server.getInstance().dispatchCommand(MyKuQApi.getConsoleSender(), finalMessage);
+                });
+                return;
             }
         }
 
     }
 
     @EventHandler
-    public void PlayerGroupMessage(EventGroupMessage e) {
+    public void playerGroupMessage(EventGroupMessage e) {
         long group = e.getGroup().getId();
         if (isGroupList(group)) {
             long user = e.getSender().getId();
@@ -265,17 +315,14 @@ public class KuQ extends IcqListener {
 
             int i = message.indexOf(a.getQQGroupCheck());
             if (a.getQQGroupCheck().equals("")) {
-                String b = a.isIDorName() ? user + "" : e.getSender().getInfo().getNickname();
-                String s = a.getSendGameMessage().replaceAll("%player%", b).replaceAll("%chat%", message);
+                String s = a.getSendGameMessage().replaceAll("%player%", user + "").replaceAll("%chat%", message).replaceAll("%player_name%", e.getSender().getInfo().getNickname());
                 Server.getInstance().broadcastMessage(s);
                 if (a.isQQ_to_Game_SendSuccessTipEnable()) {
                     e.respond(a.getQQ_to_Game_SendSuccessTip());
                 }
-                return;
             } else if (i != -1) {
                 message = message.substring(i + a.getQQGroupCheck().length());
-                String b = a.isIDorName() ? user + "" : e.getSender().getInfo().getNickname();
-                String s = a.getSendGameMessage().replaceAll("%player%", b).replaceAll("%chat%", message);
+                String s = a.getSendGameMessage().replaceAll("%player%", user + "").replaceAll("%chat%", message).replaceAll("%player_name%", e.getSender().getInfo().getNickname());
                 if (a.isQQ_to_Game_isRemoveColor()) {
                     if (s.contains("&")) {
                         s = s.replaceAll("&", "");
@@ -287,7 +334,6 @@ public class KuQ extends IcqListener {
                 if (a.isQQ_to_Game_SendSuccessTipEnable()) {
                     e.respond(a.getQQ_to_Game_SendSuccessTip());
                 }
-                return;
             }
             //list
             if (message.equals(a.getListCommands())) {
@@ -353,16 +399,17 @@ public class KuQ extends IcqListener {
 
                     String online = kuPlayer.getOfflinePlayer().isOnline() ? "在线" : "离线";
                     String money = a.getEconomy().hasAccount(kuPlayer.getOfflinePlayer()) ? String.valueOf(a.getEconomy().myMoney(kuPlayer.getOfflinePlayer())) : "无";
-                    String points = a.getPlayerPoints().containsKey(kuPlayer.getOfflinePlayer().getName())?String.valueOf(a.getPlayerPoints().get(kuPlayer.getOfflinePlayer().getName())) : "无";
+                    String points = a.getPlayerPoints().containsKey(kuPlayer.getOfflinePlayer().getName()) ? String.valueOf(a.getPlayerPoints().get(kuPlayer.getOfflinePlayer().getName())) : "无";
                     StringBuilder s = new StringBuilder("");
                     for (String ss : a.getPlayerInfo_Message()) {
                         s.append(ss
                                 .replaceAll("%player%", kuPlayer.getOfflinePlayer().getName())
                                 .replaceAll("%money%", money)
-                                .replaceAll("%points%",points)
+                                .replaceAll("%points%", points)
                                 .replaceAll("%online%", online)
                                 .replaceAll("%offline_time%", WxysUtil.toTime(kuPlayer.getOfflinePlayer().getLastPlayed() * 1000))
-                                .replaceAll("%first_time%", WxysUtil.toTime(kuPlayer.getOfflinePlayer().getFirstPlayed() * 1000)));
+                                .replaceAll("%first_time%", WxysUtil.toTime(kuPlayer.getOfflinePlayer().getFirstPlayed() * 1000))
+                                .replaceAll("%sign_timer%", a.getPlayerSign_SignTimer().get(kuPlayer.getOfflinePlayer().getName()) == null ?""+ 0 : ""+a.getPlayerSign_SignTimer().get(kuPlayer.getOfflinePlayer().getName())));
                         s.append("\n");
                     }
 
@@ -381,7 +428,7 @@ public class KuQ extends IcqListener {
                         e.respond(a.getMessage_NoBind());
                         return;
                     }
-                    Long aLong = a.getPlayerSign_SignTime().get(kuPlayer.getOfflinePlayer().getName());
+                    Long aLong = a.getPlayerSign_SignData().get(kuPlayer.getOfflinePlayer().getName());
                     Calendar calendar = Calendar.getInstance();
                     calendar.set(Calendar.HOUR_OF_DAY, 5);
                     calendar.set(Calendar.SECOND, 0);
@@ -390,10 +437,10 @@ public class KuQ extends IcqListener {
                     calendar.add(Calendar.DAY_OF_MONTH, 1);
                     long today = calendar.getTime().getTime();
                     if (aLong == null) {
-                       sign(kuPlayer,today,e);
+                        sign(kuPlayer, today, e);
                     } else {
                         if (System.currentTimeMillis() >= aLong) {
-                            sign(kuPlayer,today,e);
+                            sign(kuPlayer, today, e);
                         } else {
                             e.respond(a.getPlayerSign_AlreadySign());
                         }
@@ -403,10 +450,12 @@ public class KuQ extends IcqListener {
                     e.respond(a.getMessage_NoEnable());
                 }
             }
+
         }
     }
-    private void sign(KuPlayer kuPlayer,long today,EventGroupMessage e){
-        a.getPlayerSign_SignTime().put(kuPlayer.getOfflinePlayer().getName(), today);
+
+    private void sign(KuPlayer kuPlayer, long today, EventGroupMessage e) {
+        a.getPlayerSign_SignData().put(kuPlayer.getOfflinePlayer().getName(), today);
         int points = 0;
         int i5 = a.getPlayerSing_SignReward().indexOf("~");
         if (i5 != -1) {
@@ -421,8 +470,10 @@ public class KuQ extends IcqListener {
                 event.printStackTrace();
             }
         }
-        e.respond(a.getPlayerSign_Message().replaceAll("%reward%",""+points));
-        points += a.getPlayerPoints().get(kuPlayer.getOfflinePlayer().getName()) == null?0:a.getPlayerPoints().get(kuPlayer.getOfflinePlayer().getName());
-        a.getPlayerPoints().put(kuPlayer.getOfflinePlayer().getName(), points);
+        e.respond(a.getPlayerSign_Message().replaceAll("%reward%", "" + points));
+        MyKuQApi.addPoints(kuPlayer, points);
+        int timer = a.getPlayerSign_SignTimer().get(kuPlayer.getOfflinePlayer().getName()) == null ? 0 : a.getPlayerSign_SignTimer().get(kuPlayer.getOfflinePlayer().getName());
+        a.getPlayerSign_SignTimer().put(kuPlayer.getOfflinePlayer().getName(), timer + 1);
     }
+
 }
