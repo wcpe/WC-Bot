@@ -13,17 +13,17 @@ import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.event.EventHandler;
 import cn.nukkit.event.Listener;
-import cn.nukkit.event.player.PlayerChatEvent;
-import cn.nukkit.event.player.PlayerFormRespondedEvent;
-import cn.nukkit.event.player.PlayerJoinEvent;
-import cn.nukkit.event.player.PlayerQuitEvent;
+import cn.nukkit.event.block.BlockBreakEvent;
+import cn.nukkit.event.player.*;
 import cn.nukkit.form.element.Element;
 import cn.nukkit.form.element.ElementLabel;
 import cn.nukkit.form.element.ElementToggle;
+import cn.nukkit.level.Location;
 import cn.nukkit.plugin.PluginBase;
 import cn.nukkit.utils.Config;
 import com.wcpe.MyKuQ.Gui.ExChangeGui;
 import com.wcpe.MyKuQ.Gui.InterFace.Gui;
+import com.wcpe.MyKuQ.Jframe.EventJframe;
 import com.wcpe.MyKuQ.Obj.KuPlayer;
 import com.wcpe.MyKuQ.Obj.SignReward;
 import com.wcpe.MyKuQ.Utils.Confirm;
@@ -142,11 +142,20 @@ public class Main extends PluginBase implements Listener {
     private boolean Sudo_Enable;
     private String Admins_Sudo;
 
+    private boolean EventJframe_Enable;
+    private boolean PlayerMove_Enable;
+    private String PlayerMove_Format;
+    private int PlayerMove_CheckTime;
+    private boolean PlayerBreakBlock_Enable;
+    private String PlayerBreakBlock_Format;
+    private boolean PlayerDeath_Enable;
+    private String PlayerDeath_Format;
+
     private boolean PlayerGameTime_Enable;
     private String PlayerGameTime_Type;
     private List<String> PlayerGameTime_Command;
     private List<String> PlayerGameTime_Message;
-    private HashMap<String,Long> PlayerGameTime = new HashMap<>();
+    private HashMap<String, Integer> PlayerGameTime = new HashMap<>();
 
 
     //
@@ -159,7 +168,7 @@ public class Main extends PluginBase implements Listener {
     private String Message_GameConfirmFinish;
     private String Message_NoBind;
     private String Message_NoEnable;
-    public final static double Version = 1.6;
+    public final static double Version = 1.7;
     public final Runnable updata = () -> {
         try {
             Config conf = UpCheck.upCheckVersion();
@@ -167,7 +176,7 @@ public class Main extends PluginBase implements Listener {
             if (UpCheck.isLatestVersion(conf)) {
                 log("§4当前不是最新版本 " + "§a最新版本:§8§l" + version);
                 for (String s : conf.getSection("Version." + version).getStringList("Updata")) {
-                    log(s);
+                    log(s.replaceAll("%version%", ""+Version));
                 }
             } else {
                 log("§a§lb§r§e(§0●§e'§8◡§e'§0●§e)§a§ld§r§e当前为最新版本 " + version
@@ -177,6 +186,8 @@ public class Main extends PluginBase implements Listener {
             log("§4检查更新失败！！！");
         }
     };
+
+    EventJframe ejf;
 
     public void log(String log) {
         getServer().getConsoleSender().sendMessage("§a[§1M§2y§3K§4u§5Q§a]§r" + log);
@@ -199,6 +210,7 @@ public class Main extends PluginBase implements Listener {
     @Override
     public void onEnable() {
         instance = this;
+        log("开始加载bStats");
         new bStats(this, 6812);
         log("开始加载EconomyApi!");
         loadEconomyAPI();
@@ -206,6 +218,11 @@ public class Main extends PluginBase implements Listener {
         saveResource("Message.yml");
         saveResource("data.yml");
         reload();
+        log("开始加载玩家事件窗口");
+        if (EventJframe_Enable) {
+            ejf = new EventJframe();
+            ejf.updataPlayer();
+        }
         log("开始加载酷Q!");
         loadKuQ();
         timeUpCheck();
@@ -216,8 +233,9 @@ public class Main extends PluginBase implements Listener {
         log("§3	 / /|_/ / // / ,< / // / /_/ /");
         log("§4	/_/  /_/\\_, /_/|_|\\_,_/\\___\\_\\");
         log("§5	       /___/                  ");
-        log("§6              §aVersion: 1.6.0      ");
+        log("§6              §aVersion: 1.6.1      ");
         log("MyKuQ 加载完成");
+        enablePlayerMove();
     }
 
     @Override
@@ -319,7 +337,7 @@ public class Main extends PluginBase implements Listener {
             PlayerSign_SignTimer = (HashMap<String, Integer>) data.get("PlayerSignTimer");
         }
         if (data.get("PlayerGameTime") != null) {
-            PlayerGameTime = (HashMap<String, Long>) data.get("PlayerGameTime");
+            PlayerGameTime = (HashMap<String, Integer>) data.get("PlayerGameTime");
         }
         if (data.get("PlayerPoints") != null) {
             PlayerPoints = (HashMap<String, Integer>) data.get("PlayerPoints");
@@ -353,6 +371,15 @@ public class Main extends PluginBase implements Listener {
 
         this.Sudo_Enable = this.getConfig().getBoolean("Sudo.Enable", true);
         this.Admins_Sudo = this.getConfig().getString("Sudo.MainCommand", "sudo:");
+
+        this.EventJframe_Enable = this.getConfig().getBoolean("EventJframe.Enable", true);
+        this.PlayerMove_Enable = this.getConfig().getBoolean("EventJframe.PlayerMove.Enable", true);
+        this.PlayerMove_Format = this.getConfig().getString("EventJframe.PlayerMove.Format", "%player%从 X:%x% Y:%y% Z:%z% 移动至 X:%tx% Y:%ty% Z:%tz%");
+        this.PlayerMove_CheckTime = this.getConfig().getInt("EventJframe.PlayerMove.CheckTime", 5);
+        this.PlayerBreakBlock_Enable = this.getConfig().getBoolean("EventJframe.PlayerBreakBlock.Enable", true);
+        this.PlayerBreakBlock_Format = this.getConfig().getString("EventJframe.PlayerBreakBlock.Format", "%player%打破了 X:%x% Y:%y% Z:%z% 的 %block%");
+        this.PlayerDeath_Enable = this.getConfig().getBoolean("EventJframe.PlayerDeath.Enable", true);
+        this.PlayerDeath_Format = this.getConfig().getString("EventJframe.PlayerDeath.Format", "%player%死亡在 X:%x% Y:%y% Z:%z%");
 
         this.CheckVersion_Enable = this.getConfig().getBoolean("CheckVersion.Enable");
         this.CheckVersion_Timer = this.getConfig().getInt("CheckVersion.Time");
@@ -486,8 +513,7 @@ public class Main extends PluginBase implements Listener {
             if (a != 0) {
                 Server.getInstance().getScheduler().scheduleDelayedRepeatingTask(this, () -> {
                     for (Map.Entry<UUID, Player> p : getServer().getOnlinePlayers().entrySet()) {
-                        long b = PlayerGameTime.get(p.getValue().getName()) != null ? (PlayerGameTime.get(p.getValue().getName()) + 1) : 0;
-                        PlayerGameTime.put(p.getValue().getName(), b);
+                        PlayerGameTime.put(p.getValue().getName(), (PlayerGameTime.get(p.getValue().getName()) != null ? (PlayerGameTime.get(p.getValue().getName()) + 1) : 0));
                     }
                 }, 0, a);
             } else {
@@ -498,7 +524,7 @@ public class Main extends PluginBase implements Listener {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-       if (args.length == 1) {
+        if (args.length == 1) {
             if (args[0].equals("reload")) {
                 if (!sender.hasPermission("mykuq.use")) {
                     sender.sendMessage("§c您没得权限!");
@@ -527,13 +553,13 @@ public class Main extends PluginBase implements Listener {
                     sender.sendMessage(Message_NoEnable);
                 }
                 return true;
-            }else if("gametime".equals(args[0])){
+            } else if ("gametime".equals(args[0])) {
                 if (!(sender instanceof Player)) {
                     sender.sendMessage("§c这个指令只能玩家使用");
                     return true;
                 }
                 Player p = (Player) sender;
-                p.sendMessage("&a您当前剩余可兑换在线时间为:&e&l%time%".replaceAll("%time%", PlayerGameTime.get(p.getName()) != null ?""+PlayerGameTime.get(p.getName()) : ""+0));
+                p.sendMessage("&a您当前剩余可兑换在线时间为:&e&l%time%".replaceAll("%time%", PlayerGameTime.get(p.getName()) != null ? "" + PlayerGameTime.get(p.getName()) : "" + 0));
                 return true;
             }
             return false;
@@ -543,7 +569,7 @@ public class Main extends PluginBase implements Listener {
                 return true;
             }
             Player p = (Player) sender;
-            long s = PlayerGameTime.get(p.getName()) != null ?PlayerGameTime.get(p.getName()) : 0;
+            int s = PlayerGameTime.get(p.getName()) != null ? PlayerGameTime.get(p.getName()) : 0;
             if (args[0].equals("gametime" +
                     "") && args[1] != null) {
                 int ss;
@@ -558,30 +584,30 @@ public class Main extends PluginBase implements Listener {
                     p.sendMessage("&4使用错误 &a格式:\n/mykuq gametime &e查询剩余可兑换在线时间~\n/mykuq gametime <兑换的在线时间>&e兑换在线时间奖励~");
                     return true;
                 }
-                long cha = s - ss;
+                int cha = s - ss;
                 PlayerGameTime.put(p.getName(), cha);
                 List<String> listcommand = PlayerGameTime_Command;
                 List<String> listmessage = PlayerGameTime_Message;
-                for(String cd:listcommand) {
+                for (String cd : listcommand) {
                     cd = cd.replaceAll("%player%", p.getName());
                     cd = cd.replaceAll("%pmdh%", String.valueOf(ss));
                     cd = cd.replaceAll("%pmsy%", String.valueOf(cha));
                     try {
-                        String sourceArray = cd.substring(cd.indexOf("<")+1, cd.indexOf(">"));
+                        String sourceArray = cd.substring(cd.indexOf("<") + 1, cd.indexOf(">"));
                         int returns = 0;
                         try {
-                            returns = (int)new ScriptEngineManager().getEngineByName("JavaScript").eval(sourceArray);
-                        }catch(NullPointerException e) {
+                            returns = (int) new ScriptEngineManager().getEngineByName("JavaScript").eval(sourceArray);
+                        } catch (NullPointerException e) {
                             returns = Integer.valueOf(sourceArray);
                         }
-                        sourceArray = "<"+sourceArray+">";
+                        sourceArray = "<" + sourceArray + ">";
                         cd = cd.replace(sourceArray, String.valueOf(returns));
                         getServer().dispatchCommand(getServer().getConsoleSender(), cd);
                     } catch (ScriptException e) {
                         p.sendMessage("§4请检查配置中表达式是否正确");
                     }
                 }
-                for(String mg:listmessage) {
+                for (String mg : listmessage) {
                     mg = mg.replaceAll("%player%", p.getName());
                     mg = mg.replaceAll("%pmdh%", String.valueOf(ss));
                     mg = mg.replaceAll("%pmsy%", String.valueOf(cha));
@@ -654,6 +680,9 @@ public class Main extends PluginBase implements Listener {
 
     @EventHandler
     public void join(PlayerJoinEvent e) {
+        if (EventJframe_Enable) {
+            ejf.updataPlayer();
+        }
         if (isPlayerJoinMessage) {
             a.sendGroupMsg(MainAdminQQGroup, PlayerJoinMessage.replaceAll("%player%", e.getPlayer().getName()));
             for (long lon : QQGroup) {
@@ -664,10 +693,66 @@ public class Main extends PluginBase implements Listener {
 
     @EventHandler
     public void quit(PlayerQuitEvent e) {
+        if (EventJframe_Enable) {
+            ejf.updataPlayer();
+        }
         if (isPlayerQuitMessage) {
             a.sendGroupMsg(MainAdminQQGroup, PlayerQuitMessage.replaceAll("%player%", e.getPlayer().getName()));
             for (long lon : QQGroup) {
                 a.sendGroupMsg(lon, PlayerQuitMessage.replaceAll("%player%", e.getPlayer().getName()));
+            }
+        }
+    }
+
+    @EventHandler
+    public void breakBlock(BlockBreakEvent e) {
+        if (EventJframe_Enable) {
+            if (PlayerBreakBlock_Enable) {
+                ejf.updataEventArea( PlayerBreakBlock_Format.replaceAll("%player%",e.getPlayer().getName())
+                        .replaceAll("%x%",e.getBlock().getLocation().getFloorX()+"")
+                        .replaceAll("%y%",e.getBlock().getLocation().getFloorY()+"")
+                        .replaceAll("%z%",e.getBlock().getLocation().getFloorZ()+"")
+                        .replaceAll("%block%",e.getBlock().getName()));
+            }
+        }
+    }
+
+    @EventHandler
+    public void playerDeath(PlayerDeathEvent e) {
+        if (EventJframe_Enable) {
+            if (PlayerDeath_Enable) {
+                ejf.updataEventArea( PlayerBreakBlock_Format.replaceAll("%player%",e.getEntity().getName())
+                        .replaceAll("%x%",e.getEntity().getLocation().getFloorX()+"")
+                        .replaceAll("%y%",e.getEntity().getLocation().getFloorY()+"")
+                        .replaceAll("%z%",e.getEntity().getLocation().getFloorZ()+""));
+            }
+        }
+    }
+
+    HashMap<Player, Location> playersLocation = new HashMap<>();
+
+    void enablePlayerMove() {
+        if (EventJframe_Enable) {
+            if (PlayerMove_Enable) {
+                getServer().getScheduler().scheduleDelayedRepeatingTask(this, () -> {
+                    for (Map.Entry<UUID, Player> e : getServer().getOnlinePlayers().entrySet()) {
+                        Player p = e.getValue();
+                        Location location = playersLocation.get(p);
+                        if (location != null) {
+                            if (location.getX() != p.getLocation().getX() && location.getY() != p.getLocation().getY() && location.getZ() != p.getLocation().getZ()) {
+                                ejf.updataEventArea(PlayerMove_Format.replaceAll("%player%",p.getName())
+                                        .replaceAll("%x%",location.getFloorX()+"")
+                                        .replaceAll("%y%",location.getFloorY()+"")
+                                        .replaceAll("%z%",location.getFloorZ()+"")
+                                        .replaceAll("%tx%",p.getLocation().getFloorX()+"")
+                                        .replaceAll("%ty%",p.getLocation().getFloorY()+"")
+                                        .replaceAll("%tz%",p.getLocation().getFloorZ()+""));
+                            }
+                        }
+                        playersLocation.put(p, p.getLocation());
+                    }
+                }, PlayerMove_CheckTime * 20, PlayerMove_CheckTime * 20);
+
             }
         }
     }
@@ -984,7 +1069,7 @@ public class Main extends PluginBase implements Listener {
         return PlayerGameTime_Message;
     }
 
-    public HashMap<String, Long> getPlayerGameTime() {
+    public HashMap<String, Integer> getPlayerGameTime() {
         return PlayerGameTime;
     }
 

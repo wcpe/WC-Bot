@@ -214,6 +214,20 @@ Sudo:
   #是否开启 机器人原创控制台
   MainCommand: "sudo:"
   #主指令 例：sudo:list
+EventJframe:
+  Enable: true
+  PlayerMove:
+    Enable: true
+    Format: "%player%从 X:%x% Y:%y% Z:%z% 移动至 X:%tx% Y:%ty% Z:%tz%"
+    CheckTime: 5
+      #检测速度 多少秒一次
+  PlayerBreakBlock:
+    Enable: true
+    Format: "%player%打破了 X:%x% Y:%y% Z:%z% 的 %block%"
+  PlayerDeath:
+    Enable: true
+    Format: "%player%死亡在 X:%x% Y:%y% Z:%z%"
+
 CheckVersion:
   Enable: true
   #开启自动检测更新 不会强制下载

@@ -313,28 +313,7 @@ public class KuQ extends IcqListener {
             long user = e.getSender().getId();
             String message = e.getMessage();
 
-            int i = message.indexOf(a.getQQGroupCheck());
-            if (a.getQQGroupCheck().equals("")) {
-                String s = a.getSendGameMessage().replaceAll("%player%", user + "").replaceAll("%chat%", message).replaceAll("%player_name%", e.getSender().getInfo().getNickname());
-                Server.getInstance().broadcastMessage(s);
-                if (a.isQQ_to_Game_SendSuccessTipEnable()) {
-                    e.respond(a.getQQ_to_Game_SendSuccessTip());
-                }
-            } else if (i != -1) {
-                message = message.substring(i + a.getQQGroupCheck().length());
-                String s = a.getSendGameMessage().replaceAll("%player%", user + "").replaceAll("%chat%", message).replaceAll("%player_name%", e.getSender().getInfo().getNickname());
-                if (a.isQQ_to_Game_isRemoveColor()) {
-                    if (s.contains("&")) {
-                        s = s.replaceAll("&", "");
-                    }
-                } else {
-                    s = s.replaceAll("&", "§");
-                }
-                Server.getInstance().broadcastMessage(s);
-                if (a.isQQ_to_Game_SendSuccessTipEnable()) {
-                    e.respond(a.getQQ_to_Game_SendSuccessTip());
-                }
-            }
+
             //list
             if (message.equals(a.getListCommands())) {
                 StringBuilder s = new StringBuilder("");
@@ -417,6 +396,7 @@ public class KuQ extends IcqListener {
                     return;
                 } else {
                     e.respond(a.getMessage_NoEnable());
+                    return;
                 }
             }
             //签到
@@ -448,6 +428,29 @@ public class KuQ extends IcqListener {
                     return;
                 } else {
                     e.respond(a.getMessage_NoEnable());
+                }
+            }
+            //群 - 服 对话
+            int i = message.indexOf(a.getQQGroupCheck());
+            if (a.getQQGroupCheck().equals("")) {
+                String s = a.getSendGameMessage().replaceAll("%player%", user + "").replaceAll("%chat%", message).replaceAll("%player_name%", e.getSender().getInfo().getNickname());
+                Server.getInstance().broadcastMessage(s);
+                if (a.isQQ_to_Game_SendSuccessTipEnable()) {
+                    e.respond(a.getQQ_to_Game_SendSuccessTip());
+                }
+            } else if (i != -1) {
+                message = message.substring(i + a.getQQGroupCheck().length());
+                String s = a.getSendGameMessage().replaceAll("%player%", user + "").replaceAll("%chat%", message).replaceAll("%player_name%", e.getSender().getInfo().getNickname());
+                if (a.isQQ_to_Game_isRemoveColor()) {
+                    if (s.contains("&")) {
+                        s = s.replaceAll("&", "");
+                    }
+                } else {
+                    s = s.replaceAll("&", "§");
+                }
+                Server.getInstance().broadcastMessage(s);
+                if (a.isQQ_to_Game_SendSuccessTipEnable()) {
+                    e.respond(a.getQQ_to_Game_SendSuccessTip());
                 }
             }
 
