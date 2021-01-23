@@ -79,6 +79,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>net.mamoe</groupId>
+            <artifactId>mirai-core-qqandroid</artifactId>
+            <version>1.2.2</version> <!-- 替换版本为最新版本 -->
+        </dependency>
+        <dependency>
             <groupId>me.onebone</groupId>
             <artifactId>economyapi</artifactId>
             <version>1.0.1</version>
@@ -88,11 +93,6 @@
             <groupId>nukkit</groupId>
             <artifactId>nukkit</artifactId>
             <version>1.0.0</version>
-        </dependency>
-        <dependency>
-            <groupId>com.github.hydevelop</groupId>
-            <artifactId>PicqBotX</artifactId>
-            <version>4.12.0.1019.PRE</version>
         </dependency>
     </dependencies>
 </project>

@@ -1,8 +1,8 @@
 MainQQGroupTip:
   Enable: true
   Message:
-  - '[MyKuQ]加载成功!'
-  - '啦啦啦啦'
+    - '[MyKuQ]加载成功!'
+    - '啦啦啦啦'
   #主QQ群 插件加载完成提醒
 MainAdminQQGroup: 1008686886
 #主QQ群
@@ -43,11 +43,10 @@ ListCommands: "/list"
 #群内检测头
 ListMessage: "当前在线人数:%online_number%\n玩家列表:%online_player%"
 System:
-  ListenPort: 12138
-  #插件开放的端口
-  Ip: "127.0.0.1"
-  Port: 5700
-  #Http上报地址
+  User: 100000
+  #qq账号
+  Password: "MyKuQYes"
+  #qq密码
 WhiteList:
   Enable: true
   #是否开启
@@ -72,13 +71,13 @@ PlayerInfo:
   ConfirmTime: 20
   #秒为单位 20 为 20秒
   Message:
-  - '%player%个人信息'
-  - '金币:%money%'
-  - '积分:%points%'
-  - '状态:%online%'
-  - '离线时间:%offline_time%'
-  - '首次进服:%first_time%'
-  - '签到天数:%sign_timer%'
+    - '%player%个人信息'
+    - '金币:%money%'
+    - '积分:%points%'
+    - '状态:%online%'
+    - '离线时间:%offline_time%'
+    - '首次进服:%first_time%'
+    - '签到天数:%sign_timer%'
   #信息
 AdminCommands:
   #管理员指令列表
@@ -137,9 +136,9 @@ PlayerSign:
       Points: 100
       #需要的积分
       Commands:
-      - '[CMD]say hellow %player%'
-      - '[ACTION]§a2333%player%]10]70]20'
-      - '[TITLE]%player%]SubTitle]10]70]20'
+        - '[CMD]say hellow %player%'
+        - '[ACTION]§a2333%player%]10]70]20'
+        - '[TITLE]%player%]SubTitle]10]70]20'
       #兑换成功执行的指令
       #%player%玩家变量
       #- '[CMD]后台执行的指令]'
@@ -159,9 +158,9 @@ PlayerSign:
       Points: 100
       #需要的积分
       Commands:
-      - '[CMD]say hellow %player%'
-      - '[ACTION]§a2333%player%]10]70]20'
-      - '[TITLE]%player%]SubTitle]10]70]20'
+        - '[CMD]say hellow %player%'
+        - '[ACTION]§a2333%player%]10]70]20'
+        - '[TITLE]%player%]SubTitle]10]70]20'
       #兑换成功执行的指令
       #%player%玩家变量
       #- '[CMD]后台执行的指令]'
@@ -211,7 +210,7 @@ PlayerGameTime:
   #注意command里面 值可<1+1*5> 必须打上尖括号
 Sudo:
   Enable: true
-  #是否开启 机器人原创控制台
+  #是否开启 机器人远程控制台
   MainCommand: "sudo:"
   #主指令 例：sudo:list
 EventJframe:
@@ -220,7 +219,7 @@ EventJframe:
     Enable: true
     Format: "%player%从 X:%x% Y:%y% Z:%z% 移动至 X:%tx% Y:%ty% Z:%tz%"
     CheckTime: 5
-      #检测速度 多少秒一次
+    #检测速度 多少秒一次
   PlayerBreakBlock:
     Enable: true
     Format: "%player%打破了 X:%x% Y:%y% Z:%z% 的 %block%"

@@ -1,12 +1,5 @@
 package com.wcpe.MyKuQ;
 
-import cc.moecraft.icq.PicqBotX;
-import cc.moecraft.icq.PicqConfig;
-import cc.moecraft.icq.accounts.BotAccount;
-import cc.moecraft.icq.sender.IcqHttpApi;
-import cc.moecraft.icq.sender.returndata.returnpojo.get.RFriend;
-import cc.moecraft.icq.sender.returndata.returnpojo.get.RGroup;
-import cn.hutool.json.JSONObject;
 import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.command.Command;
@@ -30,16 +23,25 @@ import com.wcpe.MyKuQ.Utils.Confirm;
 import com.wcpe.MyKuQ.Utils.UpCheck;
 import com.wcpe.MyKuQ.Utils.WxysUtil;
 import me.onebone.economyapi.EconomyAPI;
+import net.mamoe.mirai.Bot;
+import net.mamoe.mirai.BotFactoryJvm;
+import net.mamoe.mirai.contact.Friend;
+import net.mamoe.mirai.contact.Group;
+import net.mamoe.mirai.event.Events;
+import net.mamoe.mirai.message.data.MessageChain;
+import net.mamoe.mirai.network.WrongPasswordException;
+import net.mamoe.mirai.utils.BotConfiguration;
 
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
+
+import org.json.JSONObject;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
-
 public class Main extends PluginBase implements Listener {
-
     public static Main instance;
 
     public static Main getInstance() {
@@ -74,9 +76,8 @@ public class Main extends PluginBase implements Listener {
     private String ListCommands;
     private String ListMessage;
 
-    private int System_ListenPORT;
-    private String System_IP;
-    private int System_PORT;
+    private long System_User;
+    private String System_Password;
 
     private boolean WhiteList_Enable;
     private String WhiteList_Check;
@@ -157,7 +158,6 @@ public class Main extends PluginBase implements Listener {
     private List<String> PlayerGameTime_Message;
     private HashMap<String, Integer> PlayerGameTime = new HashMap<>();
 
-
     //
 
     private String Message_PlayerQuitGroup;
@@ -168,7 +168,7 @@ public class Main extends PluginBase implements Listener {
     private String Message_GameConfirmFinish;
     private String Message_NoBind;
     private String Message_NoEnable;
-    public final static double Version = 1.7;
+    public final static double Version = 2.0;
     public final Runnable updata = () -> {
         try {
             Config conf = UpCheck.upCheckVersion();
@@ -176,11 +176,10 @@ public class Main extends PluginBase implements Listener {
             if (UpCheck.isLatestVersion(conf)) {
                 log("§4当前不是最新版本 " + "§a最新版本:§8§l" + version);
                 for (String s : conf.getSection("Version." + version).getStringList("Updata")) {
-                    log(s.replaceAll("%version%", ""+Version));
+                    log(s.replaceAll("%version%", "" + Version));
                 }
             } else {
-                log("§a§lb§r§e(§0●§e'§8◡§e'§0●§e)§a§ld§r§e当前为最新版本 " + version
-                        + " §a§lb§r§e(￣▽￣)§a§ld§r§8§l");
+                log("§a§lb§r§e(§0●§e'§8◡§e'§0●§e)§a§ld§r§e当前为最新版本 " + version + " §a§lb§r§e(￣▽￣)§a§ld§r§8§l");
             }
         } catch (IllegalThreadStateException e) {
             log("§4检查更新失败！！！");
@@ -210,20 +209,20 @@ public class Main extends PluginBase implements Listener {
     @Override
     public void onEnable() {
         instance = this;
-        log("开始加载bStats");
+        log("§a开始加载bStats");
         new bStats(this, 6812);
-        log("开始加载EconomyApi!");
+        log("§a开始加载EconomyApi!");
         loadEconomyAPI();
         saveDefaultConfig();
         saveResource("Message.yml");
         saveResource("data.yml");
         reload();
-        log("开始加载玩家事件窗口");
+        log("§a开始加载玩家事件窗口");
         if (EventJframe_Enable) {
             ejf = new EventJframe();
             ejf.updataPlayer();
         }
-        log("开始加载酷Q!");
+        log("§a开始加载酷Q!");
         loadKuQ();
         timeUpCheck();
         getServer().getPluginManager().registerEvents(this, this);
@@ -233,8 +232,9 @@ public class Main extends PluginBase implements Listener {
         log("§3	 / /|_/ / // / ,< / // / /_/ /");
         log("§4	/_/  /_/\\_, /_/|_|\\_,_/\\___\\_\\");
         log("§5	       /___/                  ");
-        log("§6              §aVersion: 1.6.1      ");
-        log("MyKuQ 加载完成");
+        log("§6              §aVersion: 2.0.2      ");
+        log("§aMyKuQ 加载完成");
+        log("§a如果您喜欢这个插件 请在Mcbbs帖子:https://www.mcbbs.net/thread-971000-1-1.html 下方给我评个分~");
         enablePlayerMove();
     }
 
@@ -244,6 +244,7 @@ public class Main extends PluginBase implements Listener {
         log("MyKuQ 卸载完成");
     }
 
+    @SuppressWarnings({"unchecked", "serial"})
     private void reload() {
         log("检查配置文件!");
         checkConfig();
@@ -268,7 +269,8 @@ public class Main extends PluginBase implements Listener {
         this.QQ_to_Game_SendSuccessTip = this.getConfig().getString("Check.GameCheck.Tip.Message", "消息发送成功~");
 
         this.QQGroupCheck = this.getConfig().getString("Check.QQGroupCheck.Message", "服:");
-        this.SendGameMessage = this.getConfig().getString("Check.QQGroupCheck.SendGameMessage", "[人工智障]%player%>>>%chat%");
+        this.SendGameMessage = this.getConfig().getString("Check.QQGroupCheck.SendGameMessage",
+                "[人工智障]%player%>>>%chat%");
         this.isIDorName = this.getConfig().getBoolean("Check.QQGroupCheck.isIDorName", true);
         this.QQ_to_Game_isRemoveColor = this.getConfig().getBoolean("Check.QQGroupCheck.isRemoveColor", true);
         this.Game_to_QQ_SendSuccessTipEnable = this.getConfig().getBoolean("Check.QQGroupCheck.Tip.Enable", true);
@@ -277,9 +279,8 @@ public class Main extends PluginBase implements Listener {
         this.ListCommands = this.getConfig().getString("ListCommands", "/list");
         this.ListMessage = this.getConfig().getString("ListMessage", "当前在线人数:%online_number%\n玩家列表:%online_player%");
 
-        this.System_ListenPORT = this.getConfig().getInt("System.ListenPort", 12138);
-        this.System_IP = this.getConfig().getString("System.Ip", "127.0.0.1");
-        this.System_PORT = this.getConfig().getInt("System.Port", 5700);
+        this.System_User = this.getConfig().getLong("System.User", 100000);
+        this.System_Password = this.getConfig().getString("System.Password", "MyKuQYes");
 
         this.WhiteList_Enable = this.getConfig().getBoolean("WhiteList.Enable", true);
         this.WhiteList_Check = this.getConfig().getString("WhiteList.Check", "申请白名单:");
@@ -300,16 +301,24 @@ public class Main extends PluginBase implements Listener {
         this.PlayerSign_Message = this.getConfig().getString("PlayerSign.Message");
         this.PlayerSign_AlreadySign = this.getConfig().getString("PlayerSign.AlreadySign");
         this.PlayerSing_SignReward = this.getConfig().getString("PlayerSign.SignReward");
-        this.PlayerSign_ExChangeReward = new ArrayList<SignReward>() {{
-            for (String s : getConfig().getSection("PlayerSign.ExChangeReward").getKeys(false)) {
-                add(new SignReward(s, getConfig().getInt("PlayerSign.ExChangeReward." + s + ".Points"), getConfig().getStringList("PlayerSign.ExChangeReward." + s + ".Commands")));
+        this.PlayerSign_ExChangeReward = new ArrayList<SignReward>() {
+            {
+                for (String s : getConfig().getSection("PlayerSign.ExChangeReward").getKeys(false)) {
+                    add(new SignReward(s, getConfig().getInt("PlayerSign.ExChangeReward." + s + ".Points"),
+                            getConfig().getStringList("PlayerSign.ExChangeReward." + s + ".Commands")));
+                }
             }
-        }};
-        this.PlayerSign_ExChangeRewardSetting_Title = this.getConfig().getString("PlayerSign.ExChangeRewardSetting.Title");
-        this.PlayerSign_ExChangeRewardSetting_PointsNotEnough = this.getConfig().getString("PlayerSign.ExChangeRewardSetting.PointsNotEnough");
-        this.PlayerSign_ExChangeRewardSetting_Success = this.getConfig().getString("PlayerSign.ExChangeRewardSetting.Success");
-        this.PlayerSign_ExChangeRewardSetting_Item = this.getConfig().getString("PlayerSign.ExChangeRewardSetting.Item");
-        this.PlayerSign_ExChangeRewardSetting_Confirm = this.getConfig().getString("PlayerSign.ExChangeRewardSetting.Confirm");
+        };
+        this.PlayerSign_ExChangeRewardSetting_Title = this.getConfig()
+                .getString("PlayerSign.ExChangeRewardSetting.Title");
+        this.PlayerSign_ExChangeRewardSetting_PointsNotEnough = this.getConfig()
+                .getString("PlayerSign.ExChangeRewardSetting.PointsNotEnough");
+        this.PlayerSign_ExChangeRewardSetting_Success = this.getConfig()
+                .getString("PlayerSign.ExChangeRewardSetting.Success");
+        this.PlayerSign_ExChangeRewardSetting_Item = this.getConfig()
+                .getString("PlayerSign.ExChangeRewardSetting.Item");
+        this.PlayerSign_ExChangeRewardSetting_Confirm = this.getConfig()
+                .getString("PlayerSign.ExChangeRewardSetting.Confirm");
 
         this.PlayerGameTime_Enable = this.getConfig().getBoolean("PlayerGameTime.Enable");
         this.PlayerGameTime_Type = this.getConfig().getString("PlayerGameTime.Type");
@@ -327,7 +336,9 @@ public class Main extends PluginBase implements Listener {
             KuPlayer.clear();
             HashMap<String, String> kuplayer = (HashMap<String, String>) data.get("KuPlayer");
             for (Map.Entry<String, String> stringUUIDEntry : kuplayer.entrySet()) {
-                KuPlayer.put(stringUUIDEntry.getKey(), new KuPlayer(getServer().getOfflinePlayer(UUID.fromString(stringUUIDEntry.getValue())), Long.valueOf(stringUUIDEntry.getKey())));
+                KuPlayer.put(stringUUIDEntry.getKey(),
+                        new KuPlayer(getServer().getOfflinePlayer(UUID.fromString(stringUUIDEntry.getValue())),
+                                Long.valueOf(stringUUIDEntry.getKey())));
             }
         }
         if (data.get("PlayerSignData") != null) {
@@ -342,7 +353,6 @@ public class Main extends PluginBase implements Listener {
         if (data.get("PlayerPoints") != null) {
             PlayerPoints = (HashMap<String, Integer>) data.get("PlayerPoints");
         }
-
 
         this.Admins_White = this.getConfig().getString("AdminCommands.White.MainCommand");
         this.Admins_White_add = this.getConfig().getString("AdminCommands.White.Add");
@@ -374,12 +384,15 @@ public class Main extends PluginBase implements Listener {
 
         this.EventJframe_Enable = this.getConfig().getBoolean("EventJframe.Enable", true);
         this.PlayerMove_Enable = this.getConfig().getBoolean("EventJframe.PlayerMove.Enable", true);
-        this.PlayerMove_Format = this.getConfig().getString("EventJframe.PlayerMove.Format", "%player%从 X:%x% Y:%y% Z:%z% 移动至 X:%tx% Y:%ty% Z:%tz%");
+        this.PlayerMove_Format = this.getConfig().getString("EventJframe.PlayerMove.Format",
+                "%player%从 X:%x% Y:%y% Z:%z% 移动至 X:%tx% Y:%ty% Z:%tz%");
         this.PlayerMove_CheckTime = this.getConfig().getInt("EventJframe.PlayerMove.CheckTime", 5);
         this.PlayerBreakBlock_Enable = this.getConfig().getBoolean("EventJframe.PlayerBreakBlock.Enable", true);
-        this.PlayerBreakBlock_Format = this.getConfig().getString("EventJframe.PlayerBreakBlock.Format", "%player%打破了 X:%x% Y:%y% Z:%z% 的 %block%");
+        this.PlayerBreakBlock_Format = this.getConfig().getString("EventJframe.PlayerBreakBlock.Format",
+                "%player%打破了 X:%x% Y:%y% Z:%z% 的 %block%");
         this.PlayerDeath_Enable = this.getConfig().getBoolean("EventJframe.PlayerDeath.Enable", true);
-        this.PlayerDeath_Format = this.getConfig().getString("EventJframe.PlayerDeath.Format", "%player%死亡在 X:%x% Y:%y% Z:%z%");
+        this.PlayerDeath_Format = this.getConfig().getString("EventJframe.PlayerDeath.Format",
+                "%player%死亡在 X:%x% Y:%y% Z:%z%");
 
         this.CheckVersion_Enable = this.getConfig().getBoolean("CheckVersion.Enable");
         this.CheckVersion_Timer = this.getConfig().getInt("CheckVersion.Time");
@@ -399,38 +412,42 @@ public class Main extends PluginBase implements Listener {
         Message_NoEnable = mess.getString("NoEnable");
     }
 
-    private PicqConfig config;
-    private PicqBotX bot;
-    private BotAccount myMcBot;
-    private IcqHttpApi a;
+    private Bot bot;
 
     private void loadKuQ() {
-        try {
-            config = new PicqConfig(System_ListenPORT);
-            bot = new PicqBotX(config);
-            bot.addAccount("MyMcBot", System_IP, System_PORT);
-            bot.getEventManager().registerListeners(new KuQ(this));
-            bot.startBot();
 
-            myMcBot = new BotAccount("MyMcBot", bot, System_IP, System_PORT);
-            a = new IcqHttpApi(bot, myMcBot, System_IP, System_PORT);
+        new Thread(() -> {
+            try {
+                        bot = BotFactoryJvm.newBot(System_User, System_Password, new BotConfiguration() {
+                    {
+                        fileBasedDeviceInfo(new File(getDataFolder(), "/deviceInfo.json").getPath());
+                    }
 
-
-            StringBuilder msg = new StringBuilder();
-            MainQQGroupTip_Message.forEach((s) -> {
-                msg.append(s + "\n");
-            });
-            msg.setCharAt(msg.length() - 1, '\0');
-            if (MainQQGroupTip_Enable) {
-                a.sendGroupMsg(MainAdminQQGroup, msg.toString());
+                });
+                bot.login();
+                Events.registerEvents(bot, new KuQ(this));
+                StringBuilder msg = new StringBuilder();
+                MainQQGroupTip_Message.forEach((s) -> {
+                    msg.append(s + "\n");
+                });
+                msg.setCharAt(msg.length() - 1, '\0');
+                if (MainQQGroupTip_Enable) {
+                    bot.getGroup(MainAdminQQGroup).sendMessage(msg.toString());
+                }
+                bot.getFriend(MainAdminQQ).sendMessage(msg.toString());
+                bot.join();
+            } catch (WrongPasswordException e) {
+                e.printStackTrace();
+                log("§4如果您是第一次使用本插件 请按照帖子 https://www.mcbbs.net/thread-971000-1-1.html 更改配置文件中System.User和System.Password为您机器人的QQ以及密码");
+                log("§4如果您已经更改还报错请检查密码 如果确认密码正确无其他异常请 在帖子下方评论或者联系作者QQ");
+            }catch (NoSuchElementException e){
+                e.printStackTrace();
+                log("§4如果您是第一次使用本插件 请按照帖子 https://www.mcbbs.net/thread-971000-1-1.html 更改配置文件中MainAdminQQGroup和MainAdminQQ");
+                log("§4如果您已经更改还报错请在帖子下方评论或者联系作者QQ");
             }
-            a.sendPrivateMsg(MainAdminQQ, msg.toString());
+        }).start();
 
-        } catch (Exception e) {
-            log("§4请检查以下酷Q插件是否加载完毕 并且配置正确");
-            log("§4如果加载完毕还提示此段消息 请联系作者Q 或者帖子下方评论");
-            e.printStackTrace();
-        }
+
     }
 
     private void savedata() {
@@ -441,7 +458,8 @@ public class Main extends PluginBase implements Listener {
         data.set("WhiteList", WhiteListPlayer);
         HashMap<String, String> kuplayer = new HashMap<>();
         for (Map.Entry<String, KuPlayer> stringKuPlayerEntry : KuPlayer.entrySet()) {
-            kuplayer.put(stringKuPlayerEntry.getKey(), stringKuPlayerEntry.getValue().getOfflinePlayer().getUniqueId().toString());
+            kuplayer.put(stringKuPlayerEntry.getKey(),
+                    stringKuPlayerEntry.getValue().getOfflinePlayer().getUniqueId().toString());
         }
         data.set("KuPlayer", kuplayer);
         data.set("PlayerSignData", PlayerSign_SignData);
@@ -513,7 +531,10 @@ public class Main extends PluginBase implements Listener {
             if (a != 0) {
                 Server.getInstance().getScheduler().scheduleDelayedRepeatingTask(this, () -> {
                     for (Map.Entry<UUID, Player> p : getServer().getOnlinePlayers().entrySet()) {
-                        PlayerGameTime.put(p.getValue().getName(), (PlayerGameTime.get(p.getValue().getName()) != null ? (PlayerGameTime.get(p.getValue().getName()) + 1) : 0));
+                        PlayerGameTime.put(p.getValue().getName(),
+                                (PlayerGameTime.get(p.getValue().getName()) != null
+                                        ? (PlayerGameTime.get(p.getValue().getName()) + 1)
+                                        : 0));
                     }
                 }, 0, a);
             } else {
@@ -522,6 +543,7 @@ public class Main extends PluginBase implements Listener {
         }
     }
 
+    @SuppressWarnings("serial")
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (args.length == 1) {
@@ -542,12 +564,18 @@ public class Main extends PluginBase implements Listener {
                     }
                     Player p = (Player) sender;
                     int points = PlayerPoints.get(p.getName()) == null ? 0 : PlayerPoints.get(p.getName());
-                    ExChangeGui exChangeGui = new ExChangeGui(PlayerSign_ExChangeRewardSetting_Title.replaceAll("%points%", "" + points), new ArrayList<Element>() {{
-                        for (SignReward s : PlayerSign_ExChangeReward) {
-                            add(new ElementLabel(PlayerSign_ExChangeRewardSetting_Item.replaceAll("%item%", s.getName()).replaceAll("%points%", "" + s.getPoint())));
-                            add(new ElementToggle(PlayerSign_ExChangeRewardSetting_Confirm, false));
-                        }
-                    }});
+                    ExChangeGui exChangeGui = new ExChangeGui(
+                            PlayerSign_ExChangeRewardSetting_Title.replaceAll("%points%", "" + points),
+                            new ArrayList<Element>() {
+                                {
+                                    for (SignReward s : PlayerSign_ExChangeReward) {
+                                        add(new ElementLabel(
+                                                PlayerSign_ExChangeRewardSetting_Item.replaceAll("%item%", s.getName())
+                                                        .replaceAll("%points%", "" + s.getPoint())));
+                                        add(new ElementToggle(PlayerSign_ExChangeRewardSetting_Confirm, false));
+                                    }
+                                }
+                            });
                     p.showFormWindow(exChangeGui);
                 } else {
                     sender.sendMessage(Message_NoEnable);
@@ -559,7 +587,8 @@ public class Main extends PluginBase implements Listener {
                     return true;
                 }
                 Player p = (Player) sender;
-                p.sendMessage("&a您当前剩余可兑换在线时间为:&e&l%time%".replaceAll("%time%", PlayerGameTime.get(p.getName()) != null ? "" + PlayerGameTime.get(p.getName()) : "" + 0));
+                p.sendMessage("&a您当前剩余可兑换在线时间为:&e&l%time%".replaceAll("%time%",
+                        PlayerGameTime.get(p.getName()) != null ? "" + PlayerGameTime.get(p.getName()) : "" + 0));
                 return true;
             }
             return false;
@@ -570,14 +599,13 @@ public class Main extends PluginBase implements Listener {
             }
             Player p = (Player) sender;
             int s = PlayerGameTime.get(p.getName()) != null ? PlayerGameTime.get(p.getName()) : 0;
-            if (args[0].equals("gametime" +
-                    "") && args[1] != null) {
+            if (args[0].equals("gametime" + "") && args[1] != null) {
                 int ss;
                 try {
                     ss = Integer.valueOf(args[1]);
                     if (ss > s || ss < 0) {
-                        p.sendMessage("&c输入错误,&a您当前剩余可兑换在线时间为:&e&l%time%"
-                                .replaceAll("%time%", s + PlayerGameTime_Type));
+                        p.sendMessage(
+                                "&c输入错误,&a您当前剩余可兑换在线时间为:&e&l%time%".replaceAll("%time%", s + PlayerGameTime_Type));
                         return true;
                     }
                 } catch (Exception e1) {
@@ -624,9 +652,9 @@ public class Main extends PluginBase implements Listener {
                     sender.sendMessage("§c您没得权限!");
                     return true;
                 }
-                for (RFriend g : a.getFriendList().getData()) {
-                    if (String.valueOf(g.getUserId()).equals(args[1])) {
-                        a.sendPrivateMsg(Long.valueOf(args[1]), args[2]);
+                for (Friend g : bot.getFriends()) {
+                    if (String.valueOf(g.getId()).equals(args[1])) {
+                        g.sendMessage(args[2]);
                         return true;
                     }
                 }
@@ -638,9 +666,9 @@ public class Main extends PluginBase implements Listener {
                     sender.sendMessage("§c您没得权限!");
                     return true;
                 }
-                for (RGroup g : a.getGroupList().getData()) {
-                    if (String.valueOf(g.getGroupId()).equals(args[1])) {
-                        a.sendGroupMsg(Long.valueOf(args[1]), args[2]);
+                for (Group g : bot.getGroups()) {
+                    if (String.valueOf(g.getId()).equals(args[1])) {
+                        g.sendMessage(args[2]);
                         return true;
                     }
                 }
@@ -656,17 +684,19 @@ public class Main extends PluginBase implements Listener {
     public void clickGui(PlayerFormRespondedEvent event) {
         if (event.getWindow() instanceof Gui) {
             JSONObject j1 = new JSONObject(event.getWindow().getJSONData());
-            if (!j1.getBool("closed")) {
+            if (!j1.getBoolean("closed")) {
                 JSONObject j2 = j1.getJSONObject("response");
                 JSONObject j3 = j2.getJSONObject("toggleResponses");
                 int c = 1;
                 for (SignReward s : PlayerSign_ExChangeReward) {
-                    if (j3.getBool(String.valueOf(c))) {
-                        int points = PlayerPoints.get(event.getPlayer().getName()) == null ? 0 : PlayerPoints.get(event.getPlayer().getName());
+                    if (j3.getBoolean(String.valueOf(c))) {
+                        int points = PlayerPoints.get(event.getPlayer().getName()) == null ? 0
+                                : PlayerPoints.get(event.getPlayer().getName());
                         if (points >= s.getPoint()) {
                             PlayerPoints.put(event.getPlayer().getName(), points - s.getPoint());
                             WxysUtil.executionCommands(s.getCommands(), event.getPlayer());
-                            event.getPlayer().sendMessage(PlayerSign_ExChangeRewardSetting_Success.replaceAll("%item%", s.getName()).replaceAll("%points%", "" + s.getPoint()));
+                            event.getPlayer().sendMessage(PlayerSign_ExChangeRewardSetting_Success
+                                    .replaceAll("%item%", s.getName()).replaceAll("%points%", "" + s.getPoint()));
                         } else {
                             event.getPlayer().sendMessage(PlayerSign_ExChangeRewardSetting_PointsNotEnough);
                         }
@@ -677,16 +707,16 @@ public class Main extends PluginBase implements Listener {
         }
     }
 
-
     @EventHandler
     public void join(PlayerJoinEvent e) {
         if (EventJframe_Enable) {
             ejf.updataPlayer();
         }
         if (isPlayerJoinMessage) {
-            a.sendGroupMsg(MainAdminQQGroup, PlayerJoinMessage.replaceAll("%player%", e.getPlayer().getName()));
+            bot.getGroup(MainAdminQQGroup)
+                    .sendMessage(PlayerJoinMessage.replaceAll("%player%", e.getPlayer().getName()));
             for (long lon : QQGroup) {
-                a.sendGroupMsg(lon, PlayerJoinMessage.replaceAll("%player%", e.getPlayer().getName()));
+                bot.getGroup(lon).sendMessage(PlayerJoinMessage.replaceAll("%player%", e.getPlayer().getName()));
             }
         }
     }
@@ -697,9 +727,10 @@ public class Main extends PluginBase implements Listener {
             ejf.updataPlayer();
         }
         if (isPlayerQuitMessage) {
-            a.sendGroupMsg(MainAdminQQGroup, PlayerQuitMessage.replaceAll("%player%", e.getPlayer().getName()));
+            bot.getGroup(MainAdminQQGroup)
+                    .sendMessage(PlayerQuitMessage.replaceAll("%player%", e.getPlayer().getName()));
             for (long lon : QQGroup) {
-                a.sendGroupMsg(lon, PlayerQuitMessage.replaceAll("%player%", e.getPlayer().getName()));
+                bot.getGroup(lon).sendMessage(PlayerQuitMessage.replaceAll("%player%", e.getPlayer().getName()));
             }
         }
     }
@@ -708,11 +739,11 @@ public class Main extends PluginBase implements Listener {
     public void breakBlock(BlockBreakEvent e) {
         if (EventJframe_Enable) {
             if (PlayerBreakBlock_Enable) {
-                ejf.updataEventArea( PlayerBreakBlock_Format.replaceAll("%player%",e.getPlayer().getName())
-                        .replaceAll("%x%",e.getBlock().getLocation().getFloorX()+"")
-                        .replaceAll("%y%",e.getBlock().getLocation().getFloorY()+"")
-                        .replaceAll("%z%",e.getBlock().getLocation().getFloorZ()+"")
-                        .replaceAll("%block%",e.getBlock().getName()));
+                ejf.updataEventArea(PlayerBreakBlock_Format.replaceAll("%player%", e.getPlayer().getName())
+                        .replaceAll("%x%", e.getBlock().getLocation().getFloorX() + "")
+                        .replaceAll("%y%", e.getBlock().getLocation().getFloorY() + "")
+                        .replaceAll("%z%", e.getBlock().getLocation().getFloorZ() + "")
+                        .replaceAll("%block%", e.getBlock().getName()));
             }
         }
     }
@@ -721,10 +752,10 @@ public class Main extends PluginBase implements Listener {
     public void playerDeath(PlayerDeathEvent e) {
         if (EventJframe_Enable) {
             if (PlayerDeath_Enable) {
-                ejf.updataEventArea( PlayerBreakBlock_Format.replaceAll("%player%",e.getEntity().getName())
-                        .replaceAll("%x%",e.getEntity().getLocation().getFloorX()+"")
-                        .replaceAll("%y%",e.getEntity().getLocation().getFloorY()+"")
-                        .replaceAll("%z%",e.getEntity().getLocation().getFloorZ()+""));
+                ejf.updataEventArea(PlayerDeath_Format.replaceAll("%player%", e.getEntity().getName())
+                        .replaceAll("%x%", e.getEntity().getLocation().getFloorX() + "")
+                        .replaceAll("%y%", e.getEntity().getLocation().getFloorY() + "")
+                        .replaceAll("%z%", e.getEntity().getLocation().getFloorZ() + ""));
             }
         }
     }
@@ -739,14 +770,15 @@ public class Main extends PluginBase implements Listener {
                         Player p = e.getValue();
                         Location location = playersLocation.get(p);
                         if (location != null) {
-                            if (location.getX() != p.getLocation().getX() && location.getY() != p.getLocation().getY() && location.getZ() != p.getLocation().getZ()) {
-                                ejf.updataEventArea(PlayerMove_Format.replaceAll("%player%",p.getName())
-                                        .replaceAll("%x%",location.getFloorX()+"")
-                                        .replaceAll("%y%",location.getFloorY()+"")
-                                        .replaceAll("%z%",location.getFloorZ()+"")
-                                        .replaceAll("%tx%",p.getLocation().getFloorX()+"")
-                                        .replaceAll("%ty%",p.getLocation().getFloorY()+"")
-                                        .replaceAll("%tz%",p.getLocation().getFloorZ()+""));
+                            if (location.getX() != p.getLocation().getX() && location.getY() != p.getLocation().getY()
+                                    && location.getZ() != p.getLocation().getZ()) {
+                                ejf.updataEventArea(PlayerMove_Format.replaceAll("%player%", p.getName())
+                                        .replaceAll("%x%", location.getFloorX() + "")
+                                        .replaceAll("%y%", location.getFloorY() + "")
+                                        .replaceAll("%z%", location.getFloorZ() + "")
+                                        .replaceAll("%tx%", p.getLocation().getFloorX() + "")
+                                        .replaceAll("%ty%", p.getLocation().getFloorY() + "")
+                                        .replaceAll("%tz%", p.getLocation().getFloorZ() + ""));
                             }
                         }
                         playersLocation.put(p, p.getLocation());
@@ -761,16 +793,18 @@ public class Main extends PluginBase implements Listener {
     public void chat(PlayerChatEvent e) {
         int i = e.getMessage().indexOf(GameCheck);
         if (getGameCheck().equals("")) {
-            String s = SendQQGroupMessage.replaceAll("%player%", e.getPlayer().getName()).replaceAll("%chat%", e.getMessage());
-            a.sendGroupMsg(MainAdminQQGroup, s);
+            String s = SendQQGroupMessage.replaceAll("%player%", e.getPlayer().getName()).replaceAll("%chat%",
+                    e.getMessage());
+            bot.getGroup(MainAdminQQGroup).sendMessage(s);
             for (long lon : QQGroup) {
-                a.sendGroupMsg(lon, s);
+                bot.getGroup(lon).sendMessage(s);
             }
             if (isGame_to_QQ_SendSuccessTipEnable()) {
                 e.getPlayer().sendMessage(getGame_to_QQ_SendSuccessTip());
             }
         } else if (i != -1) {
-            String s = SendQQGroupMessage.replaceAll("%player%", e.getPlayer().getName()).replaceAll("%chat%", e.getMessage().substring(i + GameCheck.length(), e.getMessage().length()));
+            String s = SendQQGroupMessage.replaceAll("%player%", e.getPlayer().getName()).replaceAll("%chat%",
+                    e.getMessage().substring(i + GameCheck.length(), e.getMessage().length()));
             if (Game_to_QQ_isRemoveColor) {
                 if (s.contains("&")) {
                     s = s.replaceAll("&", "");
@@ -778,9 +812,9 @@ public class Main extends PluginBase implements Listener {
             } else {
                 s = s.replaceAll("&", "§");
             }
-            a.sendGroupMsg(MainAdminQQGroup, s);
+            bot.getGroup(MainAdminQQGroup).sendMessage(s);
             for (long lon : QQGroup) {
-                a.sendGroupMsg(lon, s);
+                bot.getGroup(lon).sendMessage(s);
             }
             if (isGame_to_QQ_SendSuccessTipEnable()) {
                 e.getPlayer().sendMessage(getGame_to_QQ_SendSuccessTip());
@@ -839,7 +873,6 @@ public class Main extends PluginBase implements Listener {
     public String getPlayerSign_ExChangeRewardSetting_Confirm() {
         return PlayerSign_ExChangeRewardSetting_Confirm;
     }
-
 
     public boolean isMainQQGroupTip_Enable() {
         return MainQQGroupTip_Enable;
@@ -1137,19 +1170,6 @@ public class Main extends PluginBase implements Listener {
         return ListMessage;
     }
 
-    public int getSystem_ListenPORT() {
-        return System_ListenPORT;
-    }
-
-    public String getSystem_IP() {
-        return System_IP;
-    }
-
-    public int getSystem_PORT() {
-        return System_PORT;
-    }
-
-
     public List<Long> getAdmin() {
         return Admin;
     }
@@ -1158,7 +1178,7 @@ public class Main extends PluginBase implements Listener {
         return QQGroup;
     }
 
-    public PicqBotX getBot() {
+    public Bot getBot() {
         return bot;
     }
 
@@ -1169,13 +1189,4 @@ public class Main extends PluginBase implements Listener {
     public String getAdmins_Sudo() {
         return Admins_Sudo;
     }
-
-    public BotAccount getMyMcBot() {
-        return myMcBot;
-    }
-
-    public IcqHttpApi getA() {
-        return a;
-    }
-
 }
