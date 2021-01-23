@@ -1,6 +1,6 @@
 name: MyKuQ
 main: com.wcpe.MyKuQ.Main
-version: "2.0.2"
+version: "2.1.0"
 api: ["1.0.5"]
 author: WCPE
 prefix: "MyKuQ"

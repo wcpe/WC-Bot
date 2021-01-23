@@ -24,10 +24,11 @@ import com.wcpe.MyKuQ.Utils.UpCheck;
 import com.wcpe.MyKuQ.Utils.WxysUtil;
 import me.onebone.economyapi.EconomyAPI;
 import net.mamoe.mirai.Bot;
-import net.mamoe.mirai.BotFactoryJvm;
+import net.mamoe.mirai.BotFactory;
 import net.mamoe.mirai.contact.Friend;
 import net.mamoe.mirai.contact.Group;
 import net.mamoe.mirai.event.Events;
+import net.mamoe.mirai.event.GlobalEventChannel;
 import net.mamoe.mirai.message.data.MessageChain;
 import net.mamoe.mirai.network.WrongPasswordException;
 import net.mamoe.mirai.utils.BotConfiguration;
@@ -232,7 +233,7 @@ public class Main extends PluginBase implements Listener {
         log("§3	 / /|_/ / // / ,< / // / /_/ /");
         log("§4	/_/  /_/\\_, /_/|_|\\_,_/\\___\\_\\");
         log("§5	       /___/                  ");
-        log("§6              §aVersion: 2.0.2      ");
+        log("§6              §aVersion: "+getServer().getVersion()+"      ");
         log("§aMyKuQ 加载完成");
         log("§a如果您喜欢这个插件 请在Mcbbs帖子:https://www.mcbbs.net/thread-971000-1-1.html 下方给我评个分~");
         enablePlayerMove();
@@ -418,14 +419,14 @@ public class Main extends PluginBase implements Listener {
 
         new Thread(() -> {
             try {
-                        bot = BotFactoryJvm.newBot(System_User, System_Password, new BotConfiguration() {
-                    {
-                        fileBasedDeviceInfo(new File(getDataFolder(), "/deviceInfo.json").getPath());
-                    }
+                bot = BotFactory.INSTANCE.newBot(System_User, System_Password, new BotConfiguration() {{
+                    // 配置，例如：
+                    fileBasedDeviceInfo(new File(getDataFolder(), "/deviceInfo.json").getPath());
+                }});
 
-                });
                 bot.login();
-                Events.registerEvents(bot, new KuQ(this));
+                bot.getEventChannel().registerListenerHost(new KuQ(this));
+
                 StringBuilder msg = new StringBuilder();
                 MainQQGroupTip_Message.forEach((s) -> {
                     msg.append(s + "\n");
