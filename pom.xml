@@ -4,19 +4,18 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.example</groupId>
-    <artifactId>NukkitMyKuQ</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <groupId>top.wcpe</groupId>
+    <artifactId>WC-Bot</artifactId>
+    <version>3.0.0-SNAPSHOT</version>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <encoding>UTF-8</encoding>
+        <java.version>1.8</java.version>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+    </properties>
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
-                </configuration>
-            </plugin>
 
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
@@ -25,11 +24,6 @@
                     <descriptors> <!--描述文件路径-->
                         <descriptor>src/main/assembly/package.xml</descriptor>
                     </descriptors>
-                    <!--
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
-                    -->
                 </configuration>
                 <executions>
                     <execution>
@@ -43,44 +37,13 @@
         </plugins>
     </build>
 
-    <repositories>
-        <repository>
-            <id>jcenter</id>
-            <url>https://jcenter.bintray.com/</url>
-        </repository>
-        <repository>
-            <id>onebone</id>
-            <url>http://jenkins.onebone.me/plugin/repository/everything/</url>
-        </repository>
-        <repository>
-            <id>jitpack.io</id>
-            <url>https://jitpack.io</url>
-        </repository>
-        <repository>
-            <id>maven-ali</id>
-            <url>http://maven.aliyun.com/nexus/content/groups/public//</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-                <updatePolicy>always</updatePolicy>
-                <checksumPolicy>fail</checksumPolicy>
-            </snapshots>
-        </repository>
-    </repositories>
 
     <dependencies>
-<!--        <dependency>-->
-<!--            <groupId>net.mamoe</groupId>-->
-<!--            <artifactId>mirai-core-qqandroid</artifactId>-->
-<!--            <version>1.2.2</version> &lt;!&ndash; 替换版本为最新版本 &ndash;&gt;-->
-<!--        </dependency>-->
-            <dependency>
-                <groupId>net.mamoe</groupId>
-                <artifactId>mirai-core-jvm</artifactId>
-                <version>2.0.0</version> <!-- 替换版本为你需要的版本 -->
-            </dependency>
+        <dependency>
+            <groupId>net.mamoe</groupId>
+            <artifactId>mirai-core-jvm</artifactId>
+            <version>2.6.4</version>
+        </dependency>
         <dependency>
             <groupId>me.onebone</groupId>
             <artifactId>economyapi</artifactId>
@@ -92,5 +55,38 @@
             <artifactId>nukkit</artifactId>
             <version>1.0.0</version>
         </dependency>
+        <dependency>
+            <groupId>WcpeLib</groupId>
+            <artifactId>WcpeLib</artifactId>
+            <version>1.0.0</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/lib/WcpeLib-Nukkit-1.0-jar-with-dependencies.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>gui</groupId>
+            <artifactId>gui</artifactId>
+            <version>1.0.0</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/lib/gui-1.15.1.jar</systemPath>
+        </dependency>
     </dependencies>
+
+    <repositories>
+        <repository>
+            <id>onebone</id>
+            <url>http://jenkins.onebone.me/plugin/repository/everything/</url>
+        </repository>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+        <repository>
+            <id>central</id>
+            <url>https://repo1.maven.org/maven2/</url>
+        </repository>
+        <repository>
+            <id>jcenter</id>
+            <url>https://jcenter.bintray.com/</url>
+        </repository>
+    </repositories>
 </project>

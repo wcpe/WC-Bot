@@ -1,234 +1,192 @@
-MainQQGroupTip:
-  Enable: true
-  Message:
-    - '[MyKuQ]加载成功!'
-    - '啦啦啦啦'
-  #主QQ群 插件加载完成提醒
-MainAdminQQGroup: 1008686886
-#主QQ群
-MainAdminQQ: 1008686886
-#主管理人
-PlayerJoinMessage:
-  Enable: true
-  Message: "%player%加入了服务器"
-#玩家加入服务器时 发送到Q群里面的话
-PlayerQuitMessage:
-  Enable: true
-  Message: "%player%退出了服务器"
-#玩家退出服务器时 发送到Q群里面的话
-Check:
-  GameCheck:
-    Message: "群:"
-    #发送至QQ群的检测文本
-    SendQQGroupMessage: "%player%>>>%chat%"
+Setting:
+  bot:
+    default:
+      account: "填写 QQ 号码"
+      # QQ 账号
+      password: "填写 QQ 密码"
+      # QQ 密码
+  sendQQGroupTip:
+  # 插件加载完成将给开启的群聊发送消息
+    enable: true
+    sendMessage:
+    - 'Wc-Bot 已加载完成!'
+  mainQQ: "填写你的 QQ 号码"
+  # 机器人主人 填写你的 QQ 号码
+  serverJoinPlayer:
+    enable: true
+    message: "%player%加入了服务器"
+  serverQuitPlayer:
+    enable: true
+    message: "%player%离开了服务器"
+  serverToQQGroup:
+  #服务器给群聊发送消息
+    enable: false
+    # 是否开启
+    checkMessage: "群 "
+    # 检测开头关键字
+    sendQQGroupMessage: "%player%>>>%chat%"
+    # 发送至群聊格式
     isRemoveColor: true
-    Tip:
-      Enable: true
-      #是否开启发送完毕提示
-      Message: "消息发送成功~"
-      #发送完毕提示消息
-  QQGroupCheck:
-    Message: "服:"
-    #发送至游戏内的检测文本
-    SendGameMessage: "[人工智障]%player_name% %player%>>>%chat%"
-    isIDorName: true
-    #为true发送至游戏内就是QQ号 为false发送至游戏内就是QQ群昵称
-    isRemoveColor: true
-    Tip:
-      Enable: true
-      #是否开启发送完毕提示
-      Message: "消息发送成功~"
-      #发送完毕提示消息
-ListCommands: "/list"
-#群内检测头
-ListMessage: "当前在线人数:%online_number%\n玩家列表:%online_player%"
-System:
-  User: 100000
-  #qq账号
-  Password: "MyKuQYes"
-  #qq密码
-WhiteList:
-  Enable: true
-  #是否开启
-  Check: "申请白名单:"
-  #检测头
-  Message: "%player%成功申请了白名单~"
-  #申请成功提示 %player%为申请的玩家name
-PlayerBind:
-  Enable: true
-  #是否开启
-  Check: "绑定:"
-  #检测头
-  Message: "绑定成功~"
-  #绑定成功提示
-  ConfirmTime: 10
-  #绑定验证时间 10s 秒为单位
-PlayerInfo:
-  Enable: true
-  #是否开启
-  Check: "我的信息"
-  #检测头
-  ConfirmTime: 20
-  #秒为单位 20 为 20秒
-  Message:
-    - '%player%个人信息'
-    - '金币:%money%'
-    - '积分:%points%'
-    - '状态:%online%'
-    - '离线时间:%offline_time%'
-    - '首次进服:%first_time%'
-    - '签到天数:%sign_timer%'
-  #信息
-AdminCommands:
-  #管理员指令列表
-  White:
-    MainCommand: "/White "
-    #主指令
-    Add: "add "
-    #添加
-    Del: "del "
-    #删除
-    List: "list"
-    #列表
-  Admin:
-    MainCommand: "/Admin "
-    #主指令
-    Add: "add "
-    #添加
-    Del: "del "
-    #删除
-    List: "list"
-    #列表
-  Group:
-    MainCommand: "/Group "
-    #主指令
-    Add: "add "
-    #添加
-    Del: "del "
-    #删除
-    List: "list"
-    #列表
-  Bind:
-    MainCommand: "/Bind "
-    #主指令
-    Add: "add "
-    #添加
-    Del: "del "
-    #删除
-    List: "list"
-    #列表
-  Point:
-    MainCommand: "/Point "
-    #主指令
-    Add: "add "
-    #添加
-    Del: "del "
-    #删除
-    Check: "check "
-    #查询
-PlayerSign:
-  Enable: true
-  #是否开启
-  Check: "签到"
-  #检测头
-  ExChangeReward:
-    '金币':
-      Points: 100
-      #需要的积分
-      Commands:
-        - '[CMD]say hellow %player%'
-        - '[ACTION]§a2333%player%]10]70]20'
-        - '[TITLE]%player%]SubTitle]10]70]20'
-      #兑换成功执行的指令
-      #%player%玩家变量
-      #- '[CMD]后台执行的指令]'
-      #- '[TITLE]%player%]SubTitle]10]70]20'
-      #- '[TITLE]主标题]副标题]淡入时间]停留时间]淡出时间'
-      #- '[CHAT]我进来了啦啦啦'
-      #- '[CHAT]玩家发送的指令' #加/就是指令 不加就是消息
-      #- '[ACTION]§a2333%player%]10]70]20'
-      #- '[ACTION]发送的消息]淡入时间]停留时间]淡出时间'
-      #- '233333'
-      #- '233333 直接发送此段文字给玩家'
-      #- '[Bd]233'
-      #- '[Bd]服务器内广播消息'
-      #加/就是指令 不加就是发送文字
-      #注意[]后不能加空格
-    '钻石':
-      Points: 100
-      #需要的积分
-      Commands:
-        - '[CMD]say hellow %player%'
-        - '[ACTION]§a2333%player%]10]70]20'
-        - '[TITLE]%player%]SubTitle]10]70]20'
-      #兑换成功执行的指令
-      #%player%玩家变量
-      #- '[CMD]后台执行的指令]'
-      #- '[TITLE]%player%]SubTitle]10]70]20'
-      #- '[TITLE]主标题]副标题]淡入时间]停留时间]淡出时间'
-      #- '[CHAT]我进来了啦啦啦'
-      #- '[CHAT]玩家发送的指令' #加/就是指令 不加就是消息
-      #- '[ACTION]§a2333%player%]10]70]20'
-      #- '[ACTION]发送的消息]淡入时间]停留时间]淡出时间'
-      #- '233333'
-      #- '233333 直接发送此段文字给玩家'
-      #- '[Bd]233'
-      #- '[Bd]服务器内广播消息'
-      #加/就是指令 不加就是发送文字
-      #注意[]后不能加空格
-  ExChangeRewardSetting:
-    Title: "兑换商店    你当前积分%points%"
-    #%points%当前积分变量
-    PointsNotEnough: "积分点不足"
-    #积分不足提示
-    Success: "兑换%item%成功，花费%points%点积分"
-    Item: "物品:%item%  所需积分:%points%"
-    #物品介绍
-    Confirm: "点击选择购买"
-    #按钮坐标得字
-  SignReward: "1~100"
-  #签到奖励 1~100之间随机数字 包括1 和 100 如果不想随机就填数字
-  Message: '签到成功，获得%reward%'
-  #签到完成发送得话 %reward%获得多少积分点变量
-  AlreadySign: "你今天已经签到了~每日五点刷新签到噢~"
-PlayerGameTime:
-  Enable: true
-  Type: 'M'
-  #D或H或M或S
-  #天 时 分 秒
-  #例:如果为s就是一秒加一点 h就是一小时加一点
-  #此处 %player% 玩家变量
-  #     %pmdh% 兑换的在线时间
-  #     %pmsy% 剩余在线时间
-  #Ps:变量为以下Command Messag适用
-  Command:
-    - 'say <%pmdh%>'
-  Message:
-    - '名字:%player% '
-    - '兑换的在线时间:%pmdh% '
-    - '剩余在线时间:%pmsy% '
-  #注意command里面 值可<1+1*5> 必须打上尖括号
-Sudo:
-  Enable: true
-  #是否开启 机器人远程控制台
-  MainCommand: "sudo:"
-  #主指令 例：sudo:list
-EventJframe:
-  Enable: true
-  PlayerMove:
-    Enable: true
-    Format: "%player%从 X:%x% Y:%y% Z:%z% 移动至 X:%tx% Y:%ty% Z:%tz%"
-    CheckTime: 5
+    # 是否移除颜色代码
+    sendSuccessTip:
+      #发送成功提示
+      enable: true
+      message: "消息发送成功~"
+  qqGroupToServer:
+    #群聊给服务器发送消息
+    enable: false
+    # 是否开启
+    checkMessage: "服 "
+    # 检测开头关键字
+    sendQQGroupMessage: "[人工智障]%qq% %qq_nick% >>>%chat%"
+    # 发送至群聊格式
+    sendSuccessTip:
+      #发送成功提示
+      enable: true
+      message: "消息发送成功~"
+  customReply:
+    "帮助": "没有帮助"
+  command:
+    list:
+    #查询在线玩家
+      enable: true
+      #是否开启
+      checkString: "/list"
+      #检测指令
+      format:
+      - "当前在线人数:%online_number%"
+      - "玩家列表:%online_player%"
+    whiteList:
+      enable: true
+      #是否开启
+      checkString: "申请白名单"
+      #检测指令
+      existsWhiteList: "你已经获取了白名单 !"
+      applyWhiteSuccessTip:
+        enable: true
+        message: "成功申请了白名单~"
+        #申请成功提示
+    playerBind:
+      enable: true
+      #是否开启
+      checkString: "/bind"
+      #检测指令
+      bindSuccessTip:
+        enable: true
+        message: "绑定成功~"
+      qqBindTip: "请使用玩家 %player% 账号 在服务器内 30 秒内输入 -> 确认绑定 <- 四个字 若要取消绑定 请输入 -> 取消绑定 <- 四个字"
+      gamePlayerBindTip: "§a请在 30 秒内输入 -> 确认绑定 <- 四个字 若要取消绑定 请输入 -> 取消绑定 <- 四个字"
+      confirmBindTime: 30
+      #绑定验证时间  秒为单位
+    playerInfo:
+      enable: true
+      #是否开启
+      checkString: "/playerInfo"
+      #检测指令
+      message:
+      - '%player%个人信息'
+      - '金币: %money%'
+      - '积分: %points%'
+      - '状态: %online%'
+      - '离线时间: %offline_time%'
+      - '首次进服: %first_time%'
+      - '签到天数: %sign_timer%'
+      #信息
+    whiteListManager:
+      enable: true
+      #是否开启
+      checkString: "/whitelist"
+      #检测指令
+      subCommand:
+        add: "add"
+        #添加
+        del: "del"
+        #删除
+        list: "list"
+        #列表
+      tip: "操作成功~"
+    adnminManager:
+      enable: true
+      #是否开启
+      checkString: "/admin"
+      #检测指令
+      subCommand:
+        add: "add"
+        #添加
+        del: "del"
+        #删除
+        list: "list"
+        #列表
+      tip: "操作成功~"
+    enableManager:
+      enable: true
+      #是否开启
+      checkString: "/enableGroup"
+      #检测指令
+      subCommand:
+        add: "add"
+        #添加
+        del: "del"
+        #删除
+        list: "list"
+      #列表
+      tip: "操作成功~"
+    bindManager:
+      enable: true
+      #是否开启
+      checkString: "/bindManager"
+      #检测指令
+      subCommand:
+        add: "add"
+        #添加
+        del: "del"
+        #删除
+        list: "list"
+        #列表
+      tip: "操作成功~"
+    botPointManager:
+      enable: true
+      #是否开启
+      checkString: "/botPoint"
+      #检测指令
+      subCommand:
+        add: "add"
+        #添加
+        del: "del"
+        #删除
+        get: "get"
+        #查询
+      tip: "操作成功~"
+    playerSign:
+      enable: true
+      #是否开启
+      checkString: "/playerSign"
+      #检测指令
+      signReward: "1~1000"
+      #签到奖励 1~100之间随机数字 包括1 和 1000 如果不想随机就填数字
+      message: '签到成功，获得%reward%'
+      #签到完成发送得话 %reward%获得多少积分点变量
+      alreadySign: "你今天已经签到了~"
+    playerGameTime:
+      enable: true
+      #是否开启
+      checkString: "/playerGameTime"
+      #检测指令
+    sudo:
+      enable: true
+      #是否开启
+      checkString: "/sudo"
+      #检测指令
+EventWindow:
+  enable: false
+  playerMoveEvent:
+    enable: true
+    format: "%player%从 X:%x% Y:%y% Z:%z% 移动至 X:%tx% Y:%ty% Z:%tz%"
+    checkTime: 5
     #检测速度 多少秒一次
-  PlayerBreakBlock:
-    Enable: true
-    Format: "%player%打破了 X:%x% Y:%y% Z:%z% 的 %block%"
-  PlayerDeath:
+  playerBreakBlockEvent:
+    enable: true
+    format: "%player%打破了 X:%x% Y:%y% Z:%z% 的 %block%"
+  playerDeathEvent:
     Enable: true
     Format: "%player%死亡在 X:%x% Y:%y% Z:%z%"
-
-CheckVersion:
-  Enable: true
-  #开启自动检测更新 不会强制下载
-  Time: 86400
-  #秒为单位

@@ -1,5 +1,5 @@
-# NukkitMyKuQ
-一个Nukkit的酷Q机器人插件
+# WC-Bot
+一个Nukkit的QQ机器人插件
 非常简单使用 如果你想详细了解 请到  Minecraft(我的世界)中文论坛
 https://www.mcbbs.net/thread-971000-1-1.html
 
@@ -7,12 +7,16 @@ https://www.mcbbs.net/thread-971000-1-1.html
 本插件使用了以下 开源SDK
 
 <div align="center">
+   <img width="160" src="https://github.com/mamoe/mirai/blob/dev/docs/mirai.png" alt="logo"></br>
+
+   <img width="95" src="https://github.com/mamoe/mirai/blob/dev/docs/mirai.svg" alt="title">
 
 ----
 
 ![Gradle CI](https://github.com/mamoe/mirai/workflows/Gradle%20CI/badge.svg?branch=master)
-[![Download](https://api.bintray.com/packages/him188moe/mirai/mirai-core/images/download.svg)](https://bintray.com/him188moe/mirai/mirai-core/)
+[![Maven Central](https://img.shields.io/maven-central/v/net.mamoe/mirai-core-api.svg?label=Maven%20Central)](https://search.maven.org/search?q=net.mamoe%20mirai)
 [![Gitter](https://badges.gitter.im/mamoe/mirai.svg)](https://gitter.im/mamoe/mirai?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+[![MiraiForum](https://img.shields.io/badge/post-on%20MiraiForum-yellow)](https://mirai.mamoe.net)
 
 mirai 是一个在全平台下运行，提供 QQ Android 协议支持的高效率机器人库
 

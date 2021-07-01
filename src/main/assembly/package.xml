@@ -16,6 +16,7 @@
             <excludes>
                 <exclude>me.onebone:economyapi</exclude>
                 <exclude>nukkit:nukkit</exclude>
+                <exclude>org.projectlombok:lombok</exclude>
             </excludes>
         </dependencySet>
     </dependencySets>

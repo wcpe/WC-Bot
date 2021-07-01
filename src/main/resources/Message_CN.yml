@@ -1,0 +1,3 @@
+eventWindowKickPlayer: "%player% 被管理员在事件窗口中踢出游戏"
+youNotBindPlayer: "你没有绑定游戏账号 !"
+playerNotExistsOrNoOnline: "玩家 %player% 不存在或不在线 !"
