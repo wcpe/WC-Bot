@@ -30,14 +30,18 @@ public class SudoCommand extends BotCommandBase {
             return;
         }
         String[] msgSplit = msg.split(" ");
-        if (msgSplit.length != 2) {
+        if (msgSplit.length < 2) {
             return;
         }
-        if (!isMainQQ(e.getSender().getId())&&!WCBot.getDataManager().getQQMemberData(e.getSender().getId()).isAdmin()) return;
-
+        if (!isMainQQ(e.getSender().getId()) && !WCBot.getDataManager().getQQMemberData(e.getSender().getId()).isAdmin())
+            return;
+        StringBuilder sb = new StringBuilder(msgSplit[1]);
+        for (int i = 2; i < msgSplit.length; i++) {
+            sb.append(" ").append(msgSplit[i]);
+        }
         WCBotConsoleSender wcBotConsoleSender = WCBot.getBotManager().getWcBotConsoleSender(e);
         Server.getInstance().getScheduler().scheduleTask(() -> {
-            Server.getInstance().dispatchCommand(wcBotConsoleSender, msgSplit[1]);
+            Server.getInstance().dispatchCommand(wcBotConsoleSender, sb.toString());
         });
 
 

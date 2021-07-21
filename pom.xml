@@ -42,7 +42,7 @@
         <dependency>
             <groupId>net.mamoe</groupId>
             <artifactId>mirai-core-jvm</artifactId>
-            <version>2.6.4</version>
+            <version>2.6.7</version>
         </dependency>
         <dependency>
             <groupId>me.onebone</groupId>
@@ -61,13 +61,6 @@
             <version>1.0.0</version>
             <scope>system</scope>
             <systemPath>${basedir}/lib/WcpeLib-Nukkit-1.0-jar-with-dependencies.jar</systemPath>
-        </dependency>
-        <dependency>
-            <groupId>gui</groupId>
-            <artifactId>gui</artifactId>
-            <version>1.0.0</version>
-            <scope>system</scope>
-            <systemPath>${basedir}/lib/gui-1.15.1.jar</systemPath>
         </dependency>
     </dependencies>
 
