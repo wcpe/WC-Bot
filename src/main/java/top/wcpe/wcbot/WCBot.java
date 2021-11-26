@@ -1,6 +1,5 @@
 package top.wcpe.wcbot;
 
-import cn.nukkit.command.defaults.WhitelistCommand;
 import cn.nukkit.plugin.PluginBase;
 import cn.nukkit.utils.ConfigSection;
 import lombok.Getter;

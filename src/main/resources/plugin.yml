@@ -1,10 +1,8 @@
 name: WC-Bot
 main: top.wcpe.wcbot.WCBot
-version: "3.0.0"
+version: "${version}"
 api: ["1.0.5"]
 author: WCPE
 prefix: "WC-Bot"
 description: "WC-Bot"
-depend:
-  - "EconomyAPI"
-  - "WcpeLib"
+depend: ["WcpeLib", "EconomyAPI"]
