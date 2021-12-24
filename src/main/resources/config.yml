@@ -1,192 +1,38 @@
-Setting:
-  bot:
-    default:
-      account: "填写 QQ 号码"
-      # QQ 账号
-      password: "填写 QQ 密码"
-      # QQ 密码
-  sendQQGroupTip:
-  # 插件加载完成将给开启的群聊发送消息
-    enable: true
-    sendMessage:
+bot-manager:
+  default: test
+  setting:
+    test:
+      auto-login: false
+      account: ""
+      password: ""
+send-load-finish-tip:
+  enable: true
+  message:
     - 'Wc-Bot 已加载完成!'
-  mainQQ: "填写你的 QQ 号码"
-  # 机器人主人 填写你的 QQ 号码
-  serverJoinPlayer:
-    enable: true
-    message: "%player%加入了服务器"
-  serverQuitPlayer:
-    enable: true
-    message: "%player%离开了服务器"
-  serverToQQGroup:
+server-join-player:
+  enable: true
+  message: "%player_name%加入了服务器"
+server-quit-player:
+  enable: true
+  message: "%player_name%离开了服务器"
+server-to-qq-group:
   #服务器给群聊发送消息
-    enable: false
-    # 是否开启
-    checkMessage: "群 "
-    # 检测开头关键字
-    sendQQGroupMessage: "%player%>>>%chat%"
-    # 发送至群聊格式
-    isRemoveColor: true
-    # 是否移除颜色代码
-    sendSuccessTip:
-      #发送成功提示
-      enable: true
-      message: "消息发送成功~"
-  qqGroupToServer:
-    #群聊给服务器发送消息
-    enable: false
-    # 是否开启
-    checkMessage: "服 "
-    # 检测开头关键字
-    sendQQGroupMessage: "[人工智障]%qq% %qq_nick% >>>%chat%"
-    # 发送至群聊格式
-    sendSuccessTip:
-      #发送成功提示
-      enable: true
-      message: "消息发送成功~"
-  customReply:
-    "帮助": "没有帮助"
-  command:
-    list:
-    #查询在线玩家
-      enable: true
-      #是否开启
-      checkString: "/list"
-      #检测指令
-      format:
-      - "当前在线人数:%online_number%"
-      - "玩家列表:%online_player%"
-    whiteList:
-      enable: true
-      #是否开启
-      checkString: "申请白名单"
-      #检测指令
-      existsWhiteList: "你已经获取了白名单 !"
-      applyWhiteSuccessTip:
-        enable: true
-        message: "成功申请了白名单~"
-        #申请成功提示
-    playerBind:
-      enable: true
-      #是否开启
-      checkString: "/bind"
-      #检测指令
-      bindSuccessTip:
-        enable: true
-        message: "绑定成功~"
-      qqBindTip: "请使用玩家 %player% 账号 在服务器内 30 秒内输入 -> 确认绑定 <- 四个字 若要取消绑定 请输入 -> 取消绑定 <- 四个字"
-      gamePlayerBindTip: "§a请在 30 秒内输入 -> 确认绑定 <- 四个字 若要取消绑定 请输入 -> 取消绑定 <- 四个字"
-      confirmBindTime: 30
-      #绑定验证时间  秒为单位
-    playerInfo:
-      enable: true
-      #是否开启
-      checkString: "/playerInfo"
-      #检测指令
-      message:
-      - '%player%个人信息'
-      - '金币: %money%'
-      - '积分: %points%'
-      - '状态: %online%'
-      - '离线时间: %offline_time%'
-      - '首次进服: %first_time%'
-      - '签到天数: %sign_timer%'
-      #信息
-    whiteListManager:
-      enable: true
-      #是否开启
-      checkString: "/whitelist"
-      #检测指令
-      subCommand:
-        add: "add"
-        #添加
-        del: "del"
-        #删除
-        list: "list"
-        #列表
-      tip: "操作成功~"
-    adnminManager:
-      enable: true
-      #是否开启
-      checkString: "/admin"
-      #检测指令
-      subCommand:
-        add: "add"
-        #添加
-        del: "del"
-        #删除
-        list: "list"
-        #列表
-      tip: "操作成功~"
-    enableManager:
-      enable: true
-      #是否开启
-      checkString: "/enableGroup"
-      #检测指令
-      subCommand:
-        add: "add"
-        #添加
-        del: "del"
-        #删除
-        list: "list"
-      #列表
-      tip: "操作成功~"
-    bindManager:
-      enable: true
-      #是否开启
-      checkString: "/bindManager"
-      #检测指令
-      subCommand:
-        add: "add"
-        #添加
-        del: "del"
-        #删除
-        list: "list"
-        #列表
-      tip: "操作成功~"
-    botPointManager:
-      enable: true
-      #是否开启
-      checkString: "/botPoint"
-      #检测指令
-      subCommand:
-        add: "add"
-        #添加
-        del: "del"
-        #删除
-        get: "get"
-        #查询
-      tip: "操作成功~"
-    playerSign:
-      enable: true
-      #是否开启
-      checkString: "/playerSign"
-      #检测指令
-      signReward: "1~1000"
-      #签到奖励 1~100之间随机数字 包括1 和 1000 如果不想随机就填数字
-      message: '签到成功，获得%reward%'
-      #签到完成发送得话 %reward%获得多少积分点变量
-      alreadySign: "你今天已经签到了~"
-    playerGameTime:
-      enable: true
-      #是否开启
-      checkString: "/playerGameTime"
-      #检测指令
-    sudo:
-      enable: true
-      #是否开启
-      checkString: "/sudo"
-      #检测指令
-EventWindow:
   enable: false
-  playerMoveEvent:
+  start-message: "群 "
+  format: "%player%>>>%chat%"
+  remove-color: true
+  send-success-tip:
+    #发送成功提示
     enable: true
-    format: "%player%从 X:%x% Y:%y% Z:%z% 移动至 X:%tx% Y:%ty% Z:%tz%"
-    checkTime: 5
-    #检测速度 多少秒一次
-  playerBreakBlockEvent:
+    message: "消息发送成功~"
+qq-group-to-server:
+  #群聊给服务器发送消息
+  enable: false
+  # 是否开启
+  start-message: "服 "
+  # 检测开头关键字
+  format: "[人工智障]%qq% %qq_nick% >>>%chat%"
+  # 发送至群聊格式
+  send-success-tip:
     enable: true
-    format: "%player%打破了 X:%x% Y:%y% Z:%z% 的 %block%"
-  playerDeathEvent:
-    Enable: true
-    Format: "%player%死亡在 X:%x% Y:%y% Z:%z%"
+    message: "消息发送成功~"

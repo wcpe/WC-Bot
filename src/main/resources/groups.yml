@@ -1,0 +1,5 @@
+default-group:
+  - 'default'
+groups:
+  default:
+    - 'list.use'

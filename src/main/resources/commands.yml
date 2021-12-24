@@ -1,0 +1,77 @@
+#use-range 有 PRIVATE, GROUP, ALL
+list:
+  enable: true
+  no-enable-message: "未开启指令"
+  main-command: "list"
+  format:
+    - "当前在线人数:%online_number%"
+    - "玩家列表:%online_player%"
+  use-range: "ALL"
+  describe: "查询在线玩家"
+  aliases: []
+sudo:
+  enable: true
+  no-enable-message: "未开启指令"
+  main-command: "sudo"
+  use-range: "ALL"
+  describe: "后台调用指令"
+  aliases: ["cmd"]
+apply-whitelist:
+  enable: true
+  no-enable-message: "未开启指令"
+  main-command: "申请白名单"
+  use-range: "ALL"
+  describe: "申请白名单"
+  aliases: []
+bind-game-player:
+  enable: true
+  no-enable-message: "未开启指令"
+  main-command: "bind"
+  use-range: "ALL"
+  describe: "绑定玩家"
+  aliases: []
+  confirm-bind-time: 30
+  agree: "同意绑定"
+  cancel: "取消绑定"
+player-info:
+  enable: true
+  no-enable-message: "未开启指令"
+  main-command: "playerInfo"
+  use-range: "ALL"
+  describe: "绑定玩家"
+  aliases: []
+  format:
+    - '%player_name%个人信息'
+    - '金币: %money%'
+    - '状态: %online%'
+    - '离线时间: %offline_time%'
+    - '首次进服: %first_time%'
+white-list-manager:
+  enable: true
+  no-enable-message: "未开启指令"
+  main-command: "whitelist"
+  use-range: "ALL"
+  describe: "后台调用指令"
+  aliases: ["白名单"]
+  sub-commands:
+    add:
+      enable: true
+      no-enable-message: "未开启添加指令"
+      main-command: "add"
+      use-range: "ALL"
+      describe: "添加白名单"
+    del:
+      enable: true
+      no-enable-message: "未开启删除指令"
+      main-command: "del"
+      use-range: "ALL"
+      describe: "删除白名单"
+    list:
+      enable: true
+      no-enable-message: "未开启列表指令"
+      main-command: "list"
+      use-range: "ALL"
+      describe: "查询白名单列表"
+      format:
+        - "白名单人数:%white_number%"
+        - "白名单玩家:%white_player%"

@@ -5,4 +5,6 @@ api: ["1.0.5"]
 author: WCPE
 prefix: "WC-Bot"
 description: "WC-Bot"
-depend: ["WcpeLib", "EconomyAPI"]
+depend: ["WcpeLib"]
+softdepend:
+  - EconomyAPI
