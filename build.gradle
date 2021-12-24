@@ -35,8 +35,8 @@ repositories {
 dependencies {
     compileOnly fileTree(dir: 'libs', include: ['*.jar'])
     compileOnly "cn.nukkit:nukkit:1.0-SNAPSHOT"
-    compileOnly "top.wcpe.wcpelib.common:common:1.0.0"
-    compileOnly "top.wcpe.wcpelib.nukkit:nukkit:1.0.4-alpha"
+    compileOnly "top.wcpe.wcpelib.common:common:1.0.3"
+    compileOnly "top.wcpe.wcpelib.nukkit:nukkit:1.0.4"
     compileOnly "me.onebone:economyapi:2.0.0"
 
     implementation("net.mamoe:mirai-core:2.8.3")
