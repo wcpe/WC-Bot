@@ -29,6 +29,9 @@ repositories {
         allowInsecureProtocol = true
         url "http://maven.wcpe.top/repository/maven-public/"
     }
+    maven {
+        url "https://repo.nukkitx.com/snapshot"
+    }
     mavenCentral()
 }
 

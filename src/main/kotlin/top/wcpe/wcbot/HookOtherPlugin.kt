@@ -16,14 +16,12 @@ import cn.nukkit.Server
 class HookOtherPlugin {
 
     private val logger = WCBot.instance.logger
-    var tipsApi: Boolean = false
 
     init {
         reload()
     }
 
     fun reload() {
-        tipsApi = hookLogger("Tips")
     }
 
     private fun hookLogger(hookName: String): Boolean {
