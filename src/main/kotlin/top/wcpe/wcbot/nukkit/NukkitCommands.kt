@@ -17,7 +17,7 @@ import top.wcpe.wcpelib.nukkit.command.entity.CommandArgument
  *
  * @author WCPE
  */
-class NukkitCommands() {
+class NukkitCommands {
 
     private val logger = WCBot.instance.logger
 
@@ -100,6 +100,8 @@ class NukkitCommands() {
                 WCBot.instance.reloadConfig()
                 sender.sendMessage("开始重载消息管理器!")
                 WCBot.messageManager.reload()
+                sender.sendMessage("开始重载服务器数据!")
+                WCBot.serverData.reload()
                 sender.sendMessage("开始重载机器人!")
                 WCBot.botManager.reload()
                 sender.sendMessage("开始重载机器人指令!")
@@ -109,6 +111,7 @@ class NukkitCommands() {
                 sender.sendMessage("开始重载其他插件Hook!")
                 WCBot.instance.hookOtherPlugin.reload()
                 sender.sendMessage("重载完成!")
+                logger.info("${sender.name}重载了配置文件")
             }.build()
         )
         cp.registerThis()

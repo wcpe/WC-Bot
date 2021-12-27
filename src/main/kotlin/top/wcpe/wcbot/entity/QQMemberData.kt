@@ -16,7 +16,7 @@ data class QQMemberData(
     var wcBotPoint: Double = 0.0,
     var permissionList: MutableList<String> = mutableListOf(),
     var permissionGroups: MutableList<String> = mutableListOf(),
-    var signDayTimeStamp: MutableMap<String, Long> = mutableMapOf()
+    var signMonthDataMap: MutableMap<String, SignMonthData> = mutableMapOf()
 ) {
     constructor(qq: Long, cfg: Config) : this(
         qq,
@@ -24,10 +24,10 @@ data class QQMemberData(
         cfg.getDouble("wcBotPoint"),
         cfg.getStringList("permissionList"), cfg.getStringList("permissionGroups")
     ) {
-        if (cfg.exists("signDayTimeStamp")) {
-            var signDayTimeStampSection = cfg.getSection("signDayTimeStamp")
-            for (key in signDayTimeStampSection.getKeys(false)) {
-                signDayTimeStamp[key] = signDayTimeStampSection.getLong(key)
+        if (cfg.exists("signMonthDataMap")) {
+            val signMonthDataMapSection = cfg.getSection("signMonthDataMap")
+            for (key in signMonthDataMapSection.getKeys(false)) {
+                signMonthDataMap[key] = SignMonthData(key, signMonthDataMapSection.getSection(key))
             }
         }
     }
@@ -39,8 +39,8 @@ data class QQMemberData(
         cfg["wcBotPoint"] = wcBotPoint
         cfg["permissionList"] = permissionList
         cfg["permissionGroups"] = permissionGroups
-        for (entry in signDayTimeStamp.entries) {
-            cfg["signDayTimeStamp.${entry.key}"] = entry.value
+        for (entry in signMonthDataMap.entries) {
+            cfg["signMonthDataMap.${entry.key}"] = entry.value.serialize()
         }
         return cfg
     }

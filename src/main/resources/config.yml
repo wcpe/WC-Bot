@@ -1,5 +1,12 @@
 bot-manager:
+  enable-listener: true
+  #开启本插件机器人监听器
+  enable-commands: true
+  #开启本插件机器人指令
+  command-start: "/"
+  #指令头
   default: test
+  #默认选择机器人
   setting:
     test:
       auto-login: false

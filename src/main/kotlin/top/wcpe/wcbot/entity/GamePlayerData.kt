@@ -10,12 +10,16 @@ import cn.nukkit.utils.Config
  *
  * @author WCPE
  */
-data class GamePlayerData(val playerName: String, var bindQQ: Long? = null, val playerOnlineTime: Long = 0) {
+data class GamePlayerData(val playerName: String, var bindQQ: Long = -1, var playerOnlineTime: Long = 0) {
 
-    constructor(playerName: String, config: Config):this(playerName,config.getLong("bindQQ"),config.getLong("playerOnlineTime"))
+    constructor(playerName: String, config: Config) : this(
+        playerName,
+        config.getLong("bindQQ"),
+        config.getLong("playerOnlineTime")
+    )
 
     fun serialize(): Config {
-        var config = Config()
+        val config = Config()
         config.set("playerName", playerName)
         config.set("bindQQ", bindQQ)
         config.set("playerOnlineTime", playerOnlineTime)

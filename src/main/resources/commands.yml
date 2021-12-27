@@ -33,12 +33,22 @@ bind-game-player:
   confirm-bind-time: 30
   agree: "同意绑定"
   cancel: "取消绑定"
+unbind-game-player:
+  enable: true
+  no-enable-message: "未开启指令"
+  main-command: "unbind"
+  use-range: "ALL"
+  describe: "解除绑定"
+  aliases: []
+  confirm-bind-time: 30
+  agree: "确定解除"
+  cancel: "取消解除"
 player-info:
   enable: true
   no-enable-message: "未开启指令"
   main-command: "playerInfo"
   use-range: "ALL"
-  describe: "绑定玩家"
+  describe: "玩家信息"
   aliases: []
   format:
     - '%player_name%个人信息'
@@ -46,6 +56,22 @@ player-info:
     - '状态: %online%'
     - '离线时间: %offline_time%'
     - '首次进服: %first_time%'
+    - '在线时间: %online_time%'
+sign:
+  enable: true
+  no-enable-message: "未开启指令"
+  main-command: "sign"
+  use-range: "ALL"
+  describe: "签到指令"
+  aliases: []
+  format:
+    - '签到成功'
+    - '奖励积分 %point%'
+    - '累计签到 %total_sign_day%'
+  script: "
+  function result(day) {
+      return 1.0*day
+  }"
 white-list-manager:
   enable: true
   no-enable-message: "未开启指令"

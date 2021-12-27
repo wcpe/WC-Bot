@@ -20,10 +20,10 @@ data class ServerData(
     var enableQQGroup: MutableList<Long> = mutableListOf()
 ) {
     constructor() : this(null) {
-        load()
+        reload()
     }
 
-    fun load() {
+    fun reload() {
         val cfg = Config(file)
         this.ownerQQ = cfg.getLong("ownerQQ")
         this.enableQQGroup = cfg.getLongList("enableQQGroup")

@@ -36,7 +36,7 @@ interface IDataManager {
     }
 
     fun useSaveGamePlayerData(playerName: String, callBack: UnaryOperator<GamePlayerData>): Boolean {
-        return saveGamePlayerData(getGamePlayerData(playerName))
+        return saveGamePlayerData(callBack.apply(getGamePlayerData(playerName)))
     }
 
 }
