@@ -72,11 +72,13 @@ class NukkitCommands {
                         it.getGroup(args[0].toLong())?.run {
                             sendMessage(args[1])
                             sender.sendMessage("发送成功")
+                            return@runBlocking
                         }
+                        sender.sendMessage("群 ${args[0]} 不存在")
                     }
                     return@useSelectBot
                 }
-                sender.sendMessage("群 ${args[0]} 不存在")
+                sender.sendMessage("未指定默认机器人或未登录!")
             }.args(CommandArgument.Builder("QQ群号").build(), CommandArgument.Builder("消息").build()).build()
         )
         cp.registerSubCommand(
@@ -86,11 +88,13 @@ class NukkitCommands {
                         it.getFriend(args[0].toLong())?.run {
                             sendMessage(args[1])
                             sender.sendMessage("发送成功")
+                            return@runBlocking
                         }
+                        sender.sendMessage("好友 ${args[0]} 不存在")
                     }
                     return@useSelectBot
                 }
-                sender.sendMessage("好友 ${args[0]} 不存在")
+                sender.sendMessage("未指定默认机器人或未登录!")
             }.args(CommandArgument.Builder("QQ号").build(), CommandArgument.Builder("消息").build()).build()
         )
 

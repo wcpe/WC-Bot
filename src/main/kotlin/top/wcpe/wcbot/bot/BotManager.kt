@@ -64,18 +64,8 @@ data class BotManager(
         logger.info("默认使用机器人 ${botManagerSection.getString("default")}")
         var sendLoadFinishTipSection = WCBot.instance.config.getSection("send-load-finish-tip")
         if (sendLoadFinishTipSection.getBoolean("enable")) {
-            for (l in WCBot.serverData.enableQQGroup) {
-                selectBot?.run {
-                    getGroup(l)?.let {
-                        runBlocking {
-                            it.sendMessage(
-                                sendLoadFinishTipSection.getStringList("message")
-                                    .joinToString(separator = System.lineSeparator())
-                            )
-                        }
-                    }
-                }
-            }
+            sendMessageToEnableGroups(sendLoadFinishTipSection.getStringList("message")
+                .joinToString(System.lineSeparator()))
         }
     }
 
