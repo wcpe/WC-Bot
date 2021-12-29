@@ -8,3 +8,4 @@ description: "WC-Bot"
 depend: ["WcpeLib"]
 softdepend:
   - EconomyAPI
+  - GUI

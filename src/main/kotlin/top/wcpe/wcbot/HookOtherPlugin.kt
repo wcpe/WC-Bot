@@ -17,11 +17,14 @@ class HookOtherPlugin {
 
     private val logger = WCBot.instance.logger
 
+    var guiApi: Boolean = false
+
     init {
         reload()
     }
 
     fun reload() {
+        guiApi = hookLogger("GUI")
     }
 
     private fun hookLogger(hookName: String): Boolean {

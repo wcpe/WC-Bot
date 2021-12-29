@@ -36,12 +36,12 @@ repositories {
 }
 
 dependencies {
-    compileOnly fileTree(dir: 'libs', include: ['*.jar'])
-    compileOnly "cn.nukkit:nukkit:1.0-SNAPSHOT"
-    compileOnly "top.wcpe.wcpelib.common:common:1.0.3"
-    compileOnly "top.wcpe.wcpelib.nukkit:nukkit:1.0.4"
-    compileOnly "me.onebone:economyapi:2.0.0"
-
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation "cn.nukkit:nukkit:1.0-SNAPSHOT"
+    implementation "top.wcpe.wcpelib:wcpelib-common:1.0.5"
+    implementation "top.wcpe.wcpelib:wcpelib-nukkit:1.0.5"
+    implementation "me.onebone:economyapi:2.0.0"
+    implementation "moe.him188:gui:1.15.1"
     implementation("net.mamoe:mirai-core:2.8.3")
 
     compileOnly "org.jetbrains.kotlin:kotlin-stdlib"
