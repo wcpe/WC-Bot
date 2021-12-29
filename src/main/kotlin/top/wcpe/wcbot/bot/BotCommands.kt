@@ -125,45 +125,45 @@ class BotCommands {
                 sender.sendMessage(WCBot.messageManager.getMessage("you-must-online"))
                 return@createBotMainCommand
             }
-            if (ChatAcceptParameterManager.putChatAcceptParameterTask(
-                    playerExact,
-                    section.getLong(MESSAGE_KEY_CONFIRM_BIND_TIME),
-                    { _, message -> message == section.getString("cancel") },
-                    { player, _ ->
-                        player.sendMessage(
-                            WCBot.messageManager
-                                .getMessage("game-player-cancel-bind-player", "qq:${qqMemberData.qq}")
-                        )
-                        sender.sendMessage(
-                            WCBot.messageManager.getMessage("cancel-bind-player", "player_name:${player.name}")
-                        )
-                    },
-                    { _, message -> message == section.getString("agree") },
-                    { player, _ ->
-                        qqMemberData.bindGamePlayerName = player.name
-                        WCBotApi.saveQQMemberData(qqMemberData)
+            var putChatAcceptParameterTask = ChatAcceptParameterManager.putChatAcceptParameterTask(
+                playerExact,
+                section.getLong(MESSAGE_KEY_CONFIRM_BIND_TIME),
+                { _, message -> message == section.getString("cancel") },
+                { player, _ ->
+                    player.sendMessage(
+                        WCBot.messageManager
+                            .getMessage("game-player-cancel-bind-player", "qq:${qqMemberData.qq}")
+                    )
+                    sender.sendMessage(
+                        WCBot.messageManager.getMessage("cancel-bind-player", "player_name:${player.name}")
+                    )
+                },
+                { _, message -> message == section.getString("agree") },
+                { player, _ ->
+                    qqMemberData.bindGamePlayerName = player.name
+                    WCBotApi.saveQQMemberData(qqMemberData)
 
-                        WCBotApi.useSaveGamePlayerData(
-                            player.name
-                        ) {
-                            it.bindQQ = qqMemberData.qq
-                            it
-                        }
+                    WCBotApi.useSaveGamePlayerData(
+                        player.name
+                    ) {
+                        it.bindQQ = qqMemberData.qq
+                        it
+                    }
 
-                        player.sendMessage(
-                            WCBot.messageManager
-                                .getMessage("game-player-success-bind-player", "qq:${qqMemberData.qq}")
-                        )
-                        sender.sendMessage(
-                            WCBot.messageManager.getMessage("success-bind-player", "player_name:${player.name}")
-                        )
-                    },
-                    { player, _ ->
-                        player.sendMessage(
-                            WCBot.messageManager.getMessage("game-player-input-error-bind-player")
-                        )
-                    })
-            ) {
+                    player.sendMessage(
+                        WCBot.messageManager
+                            .getMessage("game-player-success-bind-player", "qq:${qqMemberData.qq}")
+                    )
+                    sender.sendMessage(
+                        WCBot.messageManager.getMessage("success-bind-player", "player_name:${player.name}")
+                    )
+                },
+                { player, _ ->
+                    player.sendMessage(
+                        WCBot.messageManager.getMessage("game-player-input-error-bind-player")
+                    )
+                })
+            if (putChatAcceptParameterTask == -1L) {
                 playerExact.sendMessage(
                     StringUtil.replaceString(
                         WCBot.messageManager.getMessage("game-player-tip-bind-player"),
