@@ -192,7 +192,8 @@ class BotCommands {
                     WCBot.messageManager
                         .getMessage(
                             "you-are-bind-player",
-                            "player_name:${args[0]}"
+                            "player_name:${args[0]}",
+                            "time:$putChatAcceptParameterTask"
                         )
                 )
             }
