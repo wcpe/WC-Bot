@@ -78,7 +78,6 @@ class NukkitCommands {
                     }
                     return@useSelectBot
                 }
-                sender.sendMessage("未指定默认机器人或未登录!")
             }.args(CommandArgument.Builder("QQ群号").build(), CommandArgument.Builder("消息").build()).build()
         )
         cp.registerSubCommand(
@@ -94,7 +93,6 @@ class NukkitCommands {
                     }
                     return@useSelectBot
                 }
-                sender.sendMessage("未指定默认机器人或未登录!")
             }.args(CommandArgument.Builder("QQ号").build(), CommandArgument.Builder("消息").build()).build()
         )
 

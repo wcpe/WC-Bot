@@ -75,7 +75,7 @@ data class BotManager(
 
     fun sendMessageToEnableGroups(msg: String) {
         for (l in WCBot.serverData.enableQQGroup) {
-            WCBot.botManager.useSelectBot {
+            useSelectBot {
                 it.getGroup(l)?.let {
                     runBlocking {
                         it.sendMessage(msg)
