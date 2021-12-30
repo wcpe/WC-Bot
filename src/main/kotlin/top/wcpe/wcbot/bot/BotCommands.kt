@@ -15,7 +15,6 @@ import top.wcpe.wcpelib.common.utils.collector.ListUtil
 import top.wcpe.wcpelib.common.utils.datatime.TimeUtil
 import top.wcpe.wcpelib.common.utils.string.StringUtil
 import top.wcpe.wcpelib.nukkit.chat.ChatAcceptParameterManager
-import top.wcpe.wcpelib.nukkit.otherpluginapi.economyapi.EconomyUtil
 import java.time.LocalDate
 
 
@@ -327,30 +326,10 @@ class BotCommands {
         ) { sender, _, section ->
             sender.getQQMemberData().run {
                 if (bindGamePlayerName.isNotEmpty()) {
-
-                    val gamePlayerData = WCBotApi.getGamePlayerData(bindGamePlayerName)
-                    val offlinePlayer = Server.getInstance().getOfflinePlayer(bindGamePlayerName)
-
-                    val messageList = mutableListOf<String>()
-                    for (s in section.getStringList("format")) {
-                        messageList.add(
-                            StringUtil.replaceString(
-                                s,
-                                "player_name:$bindGamePlayerName",
-                                "money:${
-                                    EconomyUtil.getEconomy()?.run {
-                                        myMoney(offlinePlayer)
-                                    }
-                                }",
-                                "online:${if (offlinePlayer.isOnline) "在线" else "离线"}",
-                                "offline_time:${TimeUtil.stampToTime(offlinePlayer.lastPlayed * 1000)}",
-                                "first_time:${TimeUtil.stampToTime(offlinePlayer.firstPlayed * 1000)}",
-                                "online_time:${TimeUtil.formatDate(gamePlayerData.playerOnlineTime * 1000)}"
-                            )
-                        )
-
-                    }
-                    sender.sendMessage(messageList.joinToString(separator = System.lineSeparator()))
+                    sender.sendMessage(
+                        WCBotFunction.formatPlayerInfoList(bindGamePlayerName, section.getStringList("format"))
+                            .joinToString(separator = System.lineSeparator())
+                    )
                     logger.info("${sender.getQQMemberData().qq} 执行了 player-info 指令")
                     return@createBotMainCommand
                 }
