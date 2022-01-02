@@ -134,7 +134,7 @@ class BotListener {
                     event.group.sendMessage(WCBot.instance.config.getString("qq-group-to-server.send-success-tip.message"))
                 }
 
-                WCBot.botManager.sendMessageToEnableGroups(
+                Server.getInstance().broadcastMessage(
                     StringUtil.replaceString(
                         WCBot.instance.config.getString("qq-group-to-server.format"),
                         "qq:${sender.id}",
