@@ -386,10 +386,21 @@ class BotCommands {
         logger.info("插件指令注册完成")
     }
 
+    private fun judgeExitsCommand(mainCommandKey: String): Boolean {
+        if(WCBot.instance.commandsConfig.exists(mainCommandKey)){
+            return true
+        }
+        logger.info("指令配置文件中 $mainCommandKey 不存在! 请尝试重新生成并检查!")
+        return false
+    }
+
     private fun createBotMainCommand(
         mainCommandKey: String, vararg commandArgument: CommandArgument,
         executeComponent: ((sender: CommandSender, args: MutableList<String>, section: ConfigSection) -> Unit)
     ) {
+        if (!judgeExitsCommand(mainCommandKey)) {
+            return
+        }
         BotCommandPlus(
             BotCommand(
                 WCBot.instance.commandsConfig.getString("$mainCommandKey.main-command"),
@@ -418,6 +429,9 @@ class BotCommands {
     private fun createBotSubMainCommand(
         mainCommandKey: String, vararg subCommands: BotCommand
     ) {
+        if (!judgeExitsCommand(mainCommandKey)) {
+            return
+        }
         BotCommandPlus(
             WCBot.instance.commandsConfig.getString("$mainCommandKey.main-command"),
             WCBot.instance,
