@@ -1,7 +1,9 @@
 package top.wcpe.wcbot.nukkit
 
+import cn.nukkit.Server
 import kotlinx.coroutines.runBlocking
 import top.wcpe.wcbot.WCBot
+import top.wcpe.wcpelib.nukkit.chat.ChatAcceptParameterManager
 import top.wcpe.wcpelib.nukkit.command.CommandPlus
 import top.wcpe.wcpelib.nukkit.command.entity.Command
 import top.wcpe.wcpelib.nukkit.command.entity.CommandArgument
@@ -94,6 +96,22 @@ class NukkitCommands {
                     return@useSelectBot
                 }
             }.args(CommandArgument.Builder("QQ号").build(), CommandArgument.Builder("消息").build()).build()
+        )
+
+        cp.registerSubCommand(
+            Command.Builder("confirmBind", "确认玩家的绑定").executeComponent { sender, args ->
+                val playerExact = Server.getInstance().getPlayerExact(args[1])
+                if (playerExact == null || !playerExact.isOnline) {
+                    sender.sendMessage("§c玩家${args[1]}不存在或不在线!")
+                    return@executeComponent
+                }
+                ChatAcceptParameterManager.playerTask[playerExact.name]?.let {
+                    ChatAcceptParameterManager.playerTask.remove(playerExact.name)
+                    it.judgeTrueTask(playerExact, args[0])
+                    return@executeComponent
+                }
+                sender.sendMessage("§c玩家未处于绑定!")
+            }.args(CommandArgument.Builder("玩家名称").build()).build()
         )
 
         cp.registerSubCommand(
