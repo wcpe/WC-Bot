@@ -57,6 +57,7 @@ player-info:
     - '离线时间: %offline_time%'
     - '首次进服: %first_time%'
     - '在线时间: %online_time%'
+    - 'Bot积分: %bot_point%'
 sign:
   enable: true
   no-enable-message: "未开启指令"
