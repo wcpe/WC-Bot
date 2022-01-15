@@ -10,6 +10,7 @@ import top.wcpe.wcbot.data.IDataManager
 import top.wcpe.wcbot.entity.ServerData
 import top.wcpe.wcbot.nukkit.NukkitCommands
 import top.wcpe.wcbot.nukkit.NukkitListener
+import top.wcpe.wcbot.nukkit.NukkitTask
 import top.wcpe.wcpelib.nukkit.manager.MessageManager
 import java.nio.file.Files
 import java.nio.file.Path
@@ -116,6 +117,8 @@ class WCBot : PluginBase() {
         botListener = BotListener()
         logger.info("注册 Nukkit 指令!")
         nukkitCommands = NukkitCommands()
+        logger.info("注册 Nukkit 任务!")
+        NukkitTask()
         logger.info("注册 Nukkit 监听器!")
         server.pluginManager.registerEvents(NukkitListener(), this)
         logger.info("启动 BStats!")
