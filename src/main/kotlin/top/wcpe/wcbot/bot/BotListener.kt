@@ -72,6 +72,14 @@ class BotListener {
             }
         }
 
+        val customReplay = { contentToString: String, commandSender: CommandSender ->
+            WCBot.instance.customReplyConfig.getString("custom-reply.$contentToString").let {
+                if (it.isNotEmpty()) {
+                    commandSender.sendMessage(it)
+                }
+            }
+        }
+
         listenerList.add(GlobalEventChannel
             .filterIsInstance<GroupMessageEvent>()
             .filter { WCBot.serverData.enableQQGroup.contains(it.group.id) }
@@ -81,6 +89,7 @@ class BotListener {
                     contentToString,
                     GroupSender(WCBotApi.getQQMemberData(event.sender.id), event)
                 )
+                customReplay(contentToString, GroupSender(WCBotApi.getQQMemberData(event.sender.id), event))
                 WCBot.instance.customReplyConfig.getString(contentToString).let {
                     if (it.isNotEmpty()) {
                         event.group.sendMessage(it)
@@ -102,11 +111,7 @@ class BotListener {
                     contentToString,
                     UserSender(WCBotApi.getQQMemberData(event.sender.id), event)
                 )
-                WCBot.instance.customReplyConfig.getString("custom-reply.$contentToString").let {
-                    if (it.isNotEmpty()) {
-                        event.sender.sendMessage(it)
-                    }
-                }
+                customReplay(contentToString, UserSender(WCBotApi.getQQMemberData(event.sender.id), event))
                 if (contentToString.startsWith(WCBot.instance.config.getString("bot-manager.command-start")))
                     if (!BotCommandManager.dispatch(
                             UserSender(WCBotApi.getQQMemberData(event.sender.id), event),
