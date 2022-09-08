@@ -1,10 +1,19 @@
+buildscript {
+    ext {
+        kotlin_version = "1.7.10"
+        wcpelibVersion = "1.0.17"
+    }
+}
+
 plugins {
-    id 'org.jetbrains.kotlin.jvm' version '1.5.31'
     id 'java'
+    id 'org.jetbrains.kotlin.jvm' version "${kotlin_version}"
+    id 'maven-publish'
+    id 'org.jetbrains.dokka' version "${kotlin_version}"
     id "com.github.johnrengelman.shadow" version "7.1.1"
 }
 
-group 'top.wcpe.wcbot'
+group 'top.wcpe'
 version '3.0.0-alpha-dev-4'
 
 
@@ -12,7 +21,7 @@ processResources {
     def props = [version: version]
     inputs.properties props
     filteringCharset 'UTF-8'
-    filesMatching('plugin.yml') {
+    filesMatching(['plugin.yml']) {
         expand props
     }
     from('src/main/java') {
@@ -26,33 +35,76 @@ processResources {
 repositories {
     mavenLocal()
     maven {
-        allowInsecureProtocol = true
         url "http://maven.wcpe.top/repository/maven-public/"
-    }
-    maven {
-        url "https://repo.nukkitx.com/snapshot"
+        allowInsecureProtocol = true
     }
     mavenCentral()
 }
 
-ext {
-    wcpelibVersion = "1.0.8"
-}
 
 dependencies {
     compileOnly fileTree(dir: 'libs', include: ['*.jar'])
     compileOnly "cn.nukkit:nukkit:1.0-SNAPSHOT"
-    compileOnly "top.wcpe.wcpelib:wcpelib-common:${rootProject.ext.wcpelibVersion}"
-    compileOnly "top.wcpe.wcpelib:wcpelib-nukkit:${rootProject.ext.wcpelibVersion}"
+    compileOnly "top.wcpe:wcpelib-common:${wcpelibVersion}"
+    compileOnly "top.wcpe:wcpelib-nukkit:${wcpelibVersion}"
     compileOnly "me.onebone:economyapi:2.0.0"
     compileOnly "moe.him188:gui:1.15.1"
-    implementation("net.mamoe:mirai-core:2.8.3")
+
+    implementation "net.mamoe:mirai-core:2.12.2"
 
     compileOnly "org.jetbrains.kotlin:kotlin-stdlib"
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
 }
+
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+}
+
 test {
     useJUnitPlatform()
 }
 
+compileKotlin {
+    kotlinOptions {
+        jvmTarget = '1.8'
+        freeCompilerArgs += "-Xjvm-default=all-compatibility"
+    }
+}
+
+compileTestKotlin {
+    kotlinOptions {
+        jvmTarget = '1.8'
+        freeCompilerArgs += "-Xjvm-default=all-compatibility"
+    }
+}
+
+task sourcesJar(type: Jar) {
+    from sourceSets.main.allSource
+    archiveClassifier = 'sources'
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+
+            groupId project.group
+            artifactId project.name
+            version project.version
+            from components.java
+            artifact sourcesJar
+        }
+    }
+    repositories {
+        maven {
+            credentials {
+                allowInsecureProtocol = true
+                username = project.findProperty("username").toString()
+                password = project.findProperty("password").toString()
+            }
+            def releasesRepoUrl = "http://maven.wcpe.top/repository/maven-releases/"
+            def snapshotsRepoUrl = "http://maven.wcpe.top/repository/maven-snapshots/"
+            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+        }
+    }
+}
