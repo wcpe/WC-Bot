@@ -14,7 +14,7 @@ plugins {
 }
 
 group 'top.wcpe'
-version '3.0.0-alpha-dev-4'
+version '3.0.0'
 
 
 processResources {
@@ -52,9 +52,17 @@ dependencies {
 
     implementation "net.mamoe:mirai-core:2.12.2"
 
-    compileOnly "org.jetbrains.kotlin:kotlin-stdlib"
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
+
+    implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-common:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    implementation "org.jetbrains:annotations:23.0.0"
+
+    testImplementation 'org.jetbrains.kotlin:kotlin-test'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.0'
 }
 
 tasks.withType(JavaCompile) {
